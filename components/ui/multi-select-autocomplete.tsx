@@ -304,16 +304,48 @@ export function MultiSelectAutocomplete({
           "flex flex-col"
         )}
         style={{ minHeight: `${height + 48}px`, height: "auto" }}
+        onClick={(e) => {
+          // If clicking on the container itself (not children), focus input
+          if (e.target === e.currentTarget) {
+            if (scrollContainerRef.current) {
+              scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight
+            }
+            setTimeout(() => {
+              inputRef.current?.focus()
+            }, 0)
+          }
+        }}
       >
         {/* Selected attendees - scrollable container */}
         <div 
           ref={scrollContainerRef}
           className="py-2 px-2 overflow-y-auto w-full scrollbar-thin cursor-text"
           style={{ maxHeight: `${height}px`, minHeight: `${height}px` }}
+          onMouseDown={(e) => {
+            const target = e.target as HTMLElement
+            // Don't handle clicks on badges or buttons
+            if (target.closest('[data-badge="true"]') || 
+                target.closest('button') ||
+                target.closest('[role="button"]')) {
+              return
+            }
+            // Prevent text selection
+            e.preventDefault()
+            // Scroll to bottom to show input
+            if (scrollContainerRef.current) {
+              scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight
+            }
+            // Focus the input
+            setTimeout(() => {
+              inputRef.current?.focus()
+            }, 0)
+          }}
           onClick={(e) => {
             const target = e.target as HTMLElement
-            // Don't handle clicks on badges (using data attribute) or buttons
-            if (target.closest('[data-badge="true"]') || target.closest('button')) {
+            // Don't handle clicks on badges or buttons
+            if (target.closest('[data-badge="true"]') || 
+                target.closest('button') ||
+                target.closest('[role="button"]')) {
               return
             }
             // Scroll to bottom to show input
