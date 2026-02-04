@@ -310,7 +310,12 @@ export function MultiSelectAutocomplete({
           ref={scrollContainerRef}
           className="py-2 px-2 overflow-y-auto w-full scrollbar-thin cursor-text"
           style={{ maxHeight: `${height}px`, minHeight: `${height}px` }}
-          onClick={() => {
+          onClick={(e) => {
+            const target = e.target as HTMLElement
+            // Don't handle clicks on badges (using data attribute) or buttons
+            if (target.closest('[data-badge="true"]') || target.closest('button')) {
+              return
+            }
             // Scroll to bottom to show input
             if (scrollContainerRef.current) {
               scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight
@@ -369,6 +374,7 @@ export function MultiSelectAutocomplete({
                     key={value}
                     variant="secondary"
                     className="h-8 px-2 py-1 text-sm font-normal bg-secondary/50 hover:bg-secondary shrink-0"
+                    data-badge="true"
                     onClick={(e) => e.stopPropagation()}
                     onMouseDown={(e) => e.stopPropagation()}
                   >
