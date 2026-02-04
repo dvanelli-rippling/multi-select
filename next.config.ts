@@ -5,8 +5,9 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true,
   },
-  // Remove basePath if deploying to root domain, or set to '/multi-select' for subdirectory
-  // basePath: '/multi-select',
+  // GitHub Pages serves from repository name subdirectory
+  basePath: '/multi-select',
+  assetPrefix: '/multi-select',
   trailingSlash: true,
 };
 
