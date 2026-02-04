@@ -9,6 +9,10 @@ export interface Person {
   department?: string
   isPurchaser?: boolean
   isCustom?: boolean
+  workLocation?: string
+  manager?: string
+  tenure?: string
+  employeeType?: string
 }
 
 // Store for custom attendees
@@ -41,11 +45,15 @@ export const peopleDatabase: Person[] = [
   {
     id: PURCHASER_ID,
     fullName: "Lando Norris",
-    jobTitle: "Purchaser",
+    jobTitle: "5% Machine 95% Results",
     avatarUrl: getAvatarUrl("Lando Norris"),
-    email: "lando.norris@company.com",
-    department: "Finance",
+    email: "sriram@rippling.com",
+    department: "Product Marketing",
     isPurchaser: true,
+    workLocation: "San Francisco",
+    manager: "Gang Wang",
+    tenure: "8 years, 1 month",
+    employeeType: "Employee",
   },
   {
     id: "1",
@@ -54,6 +62,10 @@ export const peopleDatabase: Person[] = [
     avatarUrl: getAvatarUrl("Jordan Alvarez"),
     email: "jordan.alvarez@company.com",
     department: "Product",
+    workLocation: "New York",
+    manager: "Alex Chen",
+    tenure: "3 years, 2 months",
+    employeeType: "Employee",
   },
   {
     id: "2",
@@ -62,6 +74,10 @@ export const peopleDatabase: Person[] = [
     avatarUrl: getAvatarUrl("Alexandra Chen"),
     email: "alexandra.chen@company.com",
     department: "Engineering",
+    workLocation: "Seattle",
+    manager: "David Kim",
+    tenure: "5 years, 3 months",
+    employeeType: "Employee",
   },
   {
     id: "3",
@@ -70,6 +86,10 @@ export const peopleDatabase: Person[] = [
     avatarUrl: getAvatarUrl("Marcus Thompson"),
     email: "marcus.thompson@company.com",
     department: "Design",
+    workLocation: "Austin",
+    manager: "Olivia Martinez",
+    tenure: "2 years, 8 months",
+    employeeType: "Employee",
   },
   {
     id: "4",
@@ -78,6 +98,10 @@ export const peopleDatabase: Person[] = [
     avatarUrl: getAvatarUrl("Sofia Rodriguez"),
     email: "sofia.rodriguez@company.com",
     department: "Data",
+    workLocation: "Boston",
+    manager: "Alexandra Chen",
+    tenure: "1 year, 7 months",
+    employeeType: "Employee",
   },
   {
     id: "5",
@@ -86,6 +110,10 @@ export const peopleDatabase: Person[] = [
     avatarUrl: getAvatarUrl("David Kim"),
     email: "david.kim@company.com",
     department: "Marketing",
+    workLocation: "Los Angeles",
+    manager: "Ava Wilson",
+    tenure: "6 years, 4 months",
+    employeeType: "Employee",
   },
   {
     id: "6",
@@ -94,6 +122,10 @@ export const peopleDatabase: Person[] = [
     avatarUrl: getAvatarUrl("Emily Watson"),
     email: "emily.watson@company.com",
     department: "Engineering",
+    workLocation: "Seattle",
+    manager: "David Kim",
+    tenure: "4 years, 9 months",
+    employeeType: "Employee",
   },
   {
     id: "7",
@@ -102,6 +134,10 @@ export const peopleDatabase: Person[] = [
     avatarUrl: getAvatarUrl("James Mitchell"),
     email: "james.mitchell@company.com",
     department: "Engineering",
+    workLocation: "San Francisco",
+    manager: "Alexandra Chen",
+    tenure: "2 years, 1 month",
+    employeeType: "Employee",
   },
   {
     id: "8",
@@ -110,6 +146,10 @@ export const peopleDatabase: Person[] = [
     avatarUrl: getAvatarUrl("Olivia Martinez"),
     email: "olivia.martinez@company.com",
     department: "Design",
+    workLocation: "Austin",
+    manager: "Harper Walker",
+    tenure: "3 years, 11 months",
+    employeeType: "Employee",
   },
   {
     id: "9",
@@ -118,6 +158,10 @@ export const peopleDatabase: Person[] = [
     avatarUrl: getAvatarUrl("Ryan Foster"),
     email: "ryan.foster@company.com",
     department: "Engineering",
+    workLocation: "New York",
+    manager: "David Kim",
+    tenure: "1 year, 4 months",
+    employeeType: "Employee",
   },
   {
     id: "10",
@@ -126,6 +170,10 @@ export const peopleDatabase: Person[] = [
     avatarUrl: getAvatarUrl("Isabella Garcia"),
     email: "isabella.garcia@company.com",
     department: "Marketing",
+    workLocation: "Chicago",
+    manager: "David Kim",
+    tenure: "2 years, 6 months",
+    employeeType: "Employee",
   },
   {
     id: "11",
@@ -134,6 +182,10 @@ export const peopleDatabase: Person[] = [
     avatarUrl: getAvatarUrl("Michael Brown"),
     email: "michael.brown@company.com",
     department: "Engineering",
+    workLocation: "Seattle",
+    manager: "Alexandra Chen",
+    tenure: "3 years, 3 months",
+    employeeType: "Employee",
   },
   {
     id: "12",
@@ -142,6 +194,10 @@ export const peopleDatabase: Person[] = [
     avatarUrl: getAvatarUrl("Charlotte Lee"),
     email: "charlotte.lee@company.com",
     department: "Product",
+    workLocation: "Denver",
+    manager: "Jordan Alvarez",
+    tenure: "1 year, 9 months",
+    employeeType: "Employee",
   },
   {
     id: "13",
@@ -150,6 +206,10 @@ export const peopleDatabase: Person[] = [
     avatarUrl: getAvatarUrl("Daniel White"),
     email: "daniel.white@company.com",
     department: "Sales",
+    workLocation: "Phoenix",
+    manager: "Mia Johnson",
+    tenure: "5 years, 7 months",
+    employeeType: "Employee",
   },
   {
     id: "14",
@@ -158,6 +218,10 @@ export const peopleDatabase: Person[] = [
     avatarUrl: getAvatarUrl("Amelia Taylor"),
     email: "amelia.taylor@company.com",
     department: "HR",
+    workLocation: "Portland",
+    manager: "Emma Clark",
+    tenure: "2 years, 2 months",
+    employeeType: "Employee",
   },
   {
     id: "15",
@@ -166,6 +230,10 @@ export const peopleDatabase: Person[] = [
     avatarUrl: getAvatarUrl("Lucas Anderson"),
     email: "lucas.anderson@company.com",
     department: "Engineering",
+    workLocation: "San Francisco",
+    manager: "Alexandra Chen",
+    tenure: "4 years, 5 months",
+    employeeType: "Employee",
   },
   {
     id: "16",
@@ -174,6 +242,10 @@ export const peopleDatabase: Person[] = [
     avatarUrl: getAvatarUrl("Mia Johnson"),
     email: "mia.johnson@company.com",
     department: "Customer Success",
+    workLocation: "Miami",
+    manager: "Daniel White",
+    tenure: "6 years, 8 months",
+    employeeType: "Employee",
   },
   {
     id: "17",
@@ -182,6 +254,10 @@ export const peopleDatabase: Person[] = [
     avatarUrl: getAvatarUrl("Ethan Davis"),
     email: "ethan.davis@company.com",
     department: "Engineering",
+    workLocation: "Austin",
+    manager: "David Kim",
+    tenure: "1 year, 11 months",
+    employeeType: "Employee",
   },
   {
     id: "18",
@@ -190,6 +266,10 @@ export const peopleDatabase: Person[] = [
     avatarUrl: getAvatarUrl("Ava Wilson"),
     email: "ava.wilson@company.com",
     department: "Marketing",
+    workLocation: "New York",
+    manager: "David Kim",
+    tenure: "7 years, 2 months",
+    employeeType: "Employee",
   },
   {
     id: "19",
@@ -198,6 +278,10 @@ export const peopleDatabase: Person[] = [
     avatarUrl: getAvatarUrl("Noah Moore"),
     email: "noah.moore@company.com",
     department: "Engineering",
+    workLocation: "Seattle",
+    manager: "Alexandra Chen",
+    tenure: "2 years, 10 months",
+    employeeType: "Employee",
   },
   {
     id: "20",
@@ -206,6 +290,10 @@ export const peopleDatabase: Person[] = [
     avatarUrl: getAvatarUrl("Sophia Jackson"),
     email: "sophia.jackson@company.com",
     department: "Finance",
+    workLocation: "San Francisco",
+    manager: "Emma Clark",
+    tenure: "3 years, 6 months",
+    employeeType: "Employee",
   },
   {
     id: "21",
@@ -214,6 +302,10 @@ export const peopleDatabase: Person[] = [
     avatarUrl: getAvatarUrl("Liam Harris"),
     email: "liam.harris@company.com",
     department: "Engineering",
+    workLocation: "Boston",
+    manager: "David Kim",
+    tenure: "1 year, 2 months",
+    employeeType: "Employee",
   },
   {
     id: "22",
@@ -222,6 +314,10 @@ export const peopleDatabase: Person[] = [
     avatarUrl: getAvatarUrl("Emma Clark"),
     email: "emma.clark@company.com",
     department: "Operations",
+    workLocation: "San Francisco",
+    manager: "Gang Wang",
+    tenure: "9 years, 3 months",
+    employeeType: "Employee",
   },
   {
     id: "23",
@@ -230,6 +326,10 @@ export const peopleDatabase: Person[] = [
     avatarUrl: getAvatarUrl("Oliver Lewis"),
     email: "oliver.lewis@company.com",
     department: "Marketing",
+    workLocation: "Los Angeles",
+    manager: "David Kim",
+    tenure: "2 years, 4 months",
+    employeeType: "Employee",
   },
   {
     id: "24",
@@ -238,6 +338,10 @@ export const peopleDatabase: Person[] = [
     avatarUrl: getAvatarUrl("Harper Walker"),
     email: "harper.walker@company.com",
     department: "Design",
+    workLocation: "Austin",
+    manager: "Olivia Martinez",
+    tenure: "4 years, 2 months",
+    employeeType: "Employee",
   },
   {
     id: "25",
@@ -246,6 +350,10 @@ export const peopleDatabase: Person[] = [
     avatarUrl: getAvatarUrl("Aiden Hall"),
     email: "aiden.hall@company.com",
     department: "Engineering",
+    workLocation: "Seattle",
+    manager: "Alexandra Chen",
+    tenure: "3 years, 8 months",
+    employeeType: "Employee",
   },
   {
     id: "26",
@@ -254,6 +362,10 @@ export const peopleDatabase: Person[] = [
     avatarUrl: getAvatarUrl("Evelyn Young"),
     email: "evelyn.young@company.com",
     department: "Research",
+    workLocation: "Boston",
+    manager: "Sofia Rodriguez",
+    tenure: "5 years, 1 month",
+    employeeType: "Employee",
   },
   {
     id: "27",
@@ -262,6 +374,10 @@ export const peopleDatabase: Person[] = [
     avatarUrl: getAvatarUrl("Carter King"),
     email: "carter.king@company.com",
     department: "Product",
+    workLocation: "New York",
+    manager: "Jordan Alvarez",
+    tenure: "2 years, 7 months",
+    employeeType: "Employee",
   },
   {
     id: "28",
@@ -270,6 +386,10 @@ export const peopleDatabase: Person[] = [
     avatarUrl: getAvatarUrl("Luna Wright"),
     email: "luna.wright@company.com",
     department: "Design",
+    workLocation: "Portland",
+    manager: "Olivia Martinez",
+    tenure: "1 year, 6 months",
+    employeeType: "Employee",
   },
   {
     id: "29",
@@ -278,6 +398,10 @@ export const peopleDatabase: Person[] = [
     avatarUrl: getAvatarUrl("Mason Lopez"),
     email: "mason.lopez@company.com",
     department: "Engineering",
+    workLocation: "San Francisco",
+    manager: "Alexandra Chen",
+    tenure: "6 years, 9 months",
+    employeeType: "Employee",
   },
   {
     id: "30",
@@ -286,6 +410,10 @@ export const peopleDatabase: Person[] = [
     avatarUrl: getAvatarUrl("Zoe Hill"),
     email: "zoe.hill@company.com",
     department: "Marketing",
+    workLocation: "Chicago",
+    manager: "David Kim",
+    tenure: "1 year, 8 months",
+    employeeType: "Employee",
   },
 ]
 
@@ -328,12 +456,20 @@ export const getAllPeople = (excludeIds: string[] = []): Person[] => {
 // Create a new custom attendee
 export const createCustomAttendee = (fullName: string): Person => {
   const customId = `custom-${customIdCounter++}`
+  const trimmedName = fullName.trim()
+  const email = `${trimmedName.toLowerCase().replace(/\s+/g, '.')}@company.com`
   const customPerson: Person = {
     id: customId,
-    fullName: fullName.trim(),
+    fullName: trimmedName,
     jobTitle: "Custom attendee",
-    avatarUrl: getAvatarUrl(fullName),
+    avatarUrl: getAvatarUrl(trimmedName),
+    email: email,
+    department: "Custom",
     isCustom: true,
+    workLocation: "Remote",
+    manager: "TBD",
+    tenure: "New",
+    employeeType: "Employee",
   }
   customAttendees.push(customPerson)
   return customPerson

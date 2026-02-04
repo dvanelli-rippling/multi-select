@@ -97,4 +97,9 @@
   .scrollbar-thin.overflow-y-auto::-webkit-scrollbar {
     display: block;
   }
+
+  /* Spec guide modal overlay - lighter to show underlying design */
+  [data-radix-dialog-overlay] {
+    background-color: rgba(0, 0, 0, 0.3) !important;
+  }
 }

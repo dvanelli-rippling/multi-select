@@ -1,0 +1,156 @@
+/* Pebble Design System inspired styles */
+/* Based on Rippling's Pebble Design System tokens */
+
+.pebble-theme {
+  /* Color tokens - matching Pebble design system from Figma */
+  --colorSurface: #fafafa;
+  --colorSurfaceBright: #ffffff;
+  --colorSurfaceContainerLow: #f5f5f5;
+  --colorSurfaceContainerHigh: #e8e8e8;
+  --colorSurfaceContainerHighest: #d0d0d0;
+  
+  --colorOnSurface: #202022;
+  --colorOnSurfaceVariant: #6f6f72;
+  --colorPrimary: #7a005d;
+  --colorOnPrimary: #ffffff;
+  --colorPrimaryContainer: #f3e5f1;
+  
+  --colorError: #c3402c;
+  --colorErrorContainer: #ffebee;
+  --colorSuccess: #2e7d32;
+  --colorSuccessContainer: #e8f5e9;
+  --colorWarning: #f57c00;
+  --colorWarningContainer: #fff3e0;
+  
+  --colorOutline: rgba(0, 0, 0, 0.2);
+  --colorOutlineVariant: rgba(0, 0, 0, 0.1);
+  
+  /* Override Tailwind primary colors to use Pebble purple */
+  /* Convert #7a005d to HSL: hsl(322, 100%, 24%) */
+  --primary: 322 100% 24%;
+  --primary-foreground: 0 0% 100%;
+  
+  /* Spacing tokens */
+  --space100: 4px;
+  --space200: 8px;
+  --space300: 12px;
+  --space400: 16px;
+  --space500: 20px;
+  --space600: 24px;
+  --space800: 32px;
+  --space1000: 40px;
+  --space1200: 48px;
+  --space1600: 64px;
+  
+  /* Typography styles */
+  --typography-font-family: 'Basel Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* Typography classes */
+.pebble-title-large {
+  font-family: var(--typography-font-family);
+  font-size: 24px;
+  font-weight: 535;
+  line-height: 29px;
+  letter-spacing: 0;
+  color: var(--colorOnSurface);
+}
+
+.pebble-title-medium {
+  font-family: var(--typography-font-family);
+  font-size: 18px;
+  font-weight: 535;
+  line-height: 22px;
+  letter-spacing: 0.25px;
+  color: var(--colorOnSurface);
+}
+
+.pebble-body-medium {
+  font-family: var(--typography-font-family);
+  font-size: 15px;
+  font-weight: 485;
+  line-height: 19px;
+  letter-spacing: 0.25px;
+  color: var(--colorOnSurface);
+}
+
+.pebble-body-small {
+  font-family: var(--typography-font-family);
+  font-size: 14px;
+  font-weight: 485;
+  line-height: 17px;
+  letter-spacing: 0;
+  color: var(--colorOnSurfaceVariant);
+}
+
+.pebble-label {
+  font-family: var(--typography-font-family);
+  font-size: 15px;
+  font-weight: 485;
+  line-height: 19px;
+  letter-spacing: 0.25px;
+  color: var(--colorOnSurface);
+}
+
+/* Card styling */
+.pebble-card {
+  background-color: var(--colorSurfaceBright);
+  border: 1px solid var(--colorOutlineVariant);
+  border-radius: 12px;
+}
+
+/* Input styling */
+.pebble-input {
+  background-color: var(--colorSurfaceBright);
+  border: 1px solid var(--colorOutline);
+  border-radius: 8px;
+  color: var(--colorOnSurface);
+  font-family: var(--typography-font-family);
+  font-size: 15px;
+  font-weight: 485;
+  line-height: 19px;
+}
+
+.pebble-input:focus {
+  outline: none;
+  border-color: var(--colorPrimary);
+  box-shadow: 0 0 0 2px var(--colorPrimaryContainer);
+}
+
+.pebble-input-border {
+  border: 1px solid var(--colorOutline);
+}
+
+.pebble-border {
+  border-color: var(--colorOutline);
+}
+
+/* Tab styling - Switch tabs */
+.pebble-tab {
+  font-family: var(--typography-font-family, 'Basel Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif) !important;
+  transition: all 0.2s;
+}
+
+.pebble-tab:hover:not([data-state="active"]) {
+  background-color: var(--colorSurfaceContainerLow, #f5f5f5) !important;
+}
+
+/* Override any default Radix/Shadcn tab styles when Pebble theme is active */
+.pebble-theme [role="tab"] {
+  background-color: white !important;
+  color: #7a005d !important;
+  border: 1px solid rgba(0,0,0,0.1) !important;
+}
+
+.pebble-theme [role="tab"][data-state="active"] {
+  background-color: #7a005d !important;
+  color: white !important;
+  border-color: #7a005d !important;
+}
+
+/* Header and footer */
+.pebble-header,
+.pebble-footer {
+  background-color: var(--colorSurfaceBright);
+  border-color: var(--colorOutlineVariant);
+}

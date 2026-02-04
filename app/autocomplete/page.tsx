@@ -18,27 +18,25 @@ import { TabsSwitch, TabsSwitchList, TabsSwitchTrigger } from "@/components/ui/t
 import { Switch } from "@/components/ui/switch"
 import { Card } from "@/components/ui/card"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { MultiSelect } from "@/components/ui/multi-select"
 import { MultiSelectAutocomplete } from "@/components/ui/multi-select-autocomplete"
 import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet"
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 import { PURCHASER_ID } from "@/lib/people-db"
-import "./pebble/pebble-styles.css"
+import "../pebble/pebble-styles.css"
 
-export default function Home() {
+export default function AutocompletePage() {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState("upload")
   const [selectedAttendees, setSelectedAttendees] = useState<string[]>([PURCHASER_ID])
   const [totalAmount, setTotalAmount] = useState("3331.20")
   const [usePebbleStyle, setUsePebbleStyle] = useState(false)
   const [specGuideOpen, setSpecGuideOpen] = useState(false)
-  const [searchMode, setSearchMode] = useState<"dropdown" | "input">("input")
   const [receiptWidth, setReceiptWidth] = useState(288)
   const [isResizing, setIsResizing] = useState(false)
   const [isFormNarrow, setIsFormNarrow] = useState(false)
@@ -101,36 +99,23 @@ export default function Home() {
     <div className={cn("min-h-screen", usePebbleStyle && "pebble-theme")} style={usePebbleStyle ? { backgroundColor: '#fafafa' } : { backgroundColor: '#fafafa' }}>
       {/* Navigation Bar - Outside Prototype */}
       <div className="bg-white border-b border-[rgba(0,0,0,0.1)]">
-        <div className="max-w-7xl mx-auto px-12 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Label htmlFor="search-mode" className="text-sm font-normal text-foreground">
-              Search mode:
-            </Label>
-            <Select
-              value={searchMode}
-              onValueChange={(value) => {
-                if (value === "dropdown" || value === "input") {
-                  setSearchMode(value)
-                }
-              }}
-            >
-              <SelectTrigger id="search-mode" className="w-[200px] h-8 text-sm">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="input">Search in attendees input</SelectItem>
-                <SelectItem value="dropdown">Search in dropdown</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+        <div className="max-w-7xl mx-auto px-12 py-3 flex items-center gap-6">
           <Button
-            variant="outline"
+            variant="ghost"
+            size="sm"
+            className="gap-2 text-sm font-normal"
+            onClick={() => router.push("/")}
+          >
+            ← Back to Original
+          </Button>
+          <Button
+            variant="ghost"
             size="sm"
             className="gap-2 text-sm font-normal"
             onClick={() => setSpecGuideOpen(true)}
           >
             <FileText className="h-4 w-4" />
-            Spec guide (Read me)
+            Spec Guide
           </Button>
         </div>
       </div>
@@ -145,7 +130,7 @@ export default function Home() {
             fontSize: '24px',
             fontWeight: 500
           } : { color: '#202022' }}>
-            Reimbursement
+            Reimbursement (Autocomplete Variant)
           </h1>
           <Button variant="ghost" size="icon" className="h-10 w-10">
             <X className="h-5 w-5" />
@@ -354,7 +339,7 @@ export default function Home() {
                   </div>
                 </div>
 
-                {/* Attendees - Multi-select */}
+                {/* Attendees - Autocomplete Multi-select */}
                 <div className={cn("flex gap-4 items-start", isFormNarrow && "flex-col gap-2")}>
                   <div className={cn("flex items-center gap-1", isFormNarrow ? "w-auto h-auto" : "w-[156px]")}>
                     <Label className={cn(usePebbleStyle ? "pebble-label" : "text-[15px] tracking-wide")}>Attendees</Label>
@@ -362,40 +347,21 @@ export default function Home() {
                     <HelpCircle className="h-4 w-4 text-muted-foreground" />
                   </div>
                   <div className={cn(isFormNarrow ? "w-full" : "flex-1")}>
-                    {searchMode === "dropdown" ? (
-                      <MultiSelect
-                        selected={selectedAttendees}
-                        onChange={setSelectedAttendees}
-                        placeholder="Select attendees..."
-                        perPersonAmount={(() => {
-                          const amount = parseFloat(totalAmount) || 0
-                          const attendeeCount = selectedAttendees.length || 1
-                          const perPerson = amount / attendeeCount
-                          const isPurchaserIncluded = selectedAttendees.includes(PURCHASER_ID)
-                          const baseText = perPerson > 0 ? `$${perPerson.toFixed(2)} per person` : undefined
-                          return baseText && !isPurchaserIncluded 
-                            ? `${baseText} · Purchaser not on expense`
-                            : baseText
-                        })()}
-                        usePeopleDatabase={true}
-                      />
-                    ) : (
-                      <MultiSelectAutocomplete
-                        selected={selectedAttendees}
-                        onChange={setSelectedAttendees}
-                        placeholder="Select attendees..."
-                        perPersonAmount={(() => {
-                          const amount = parseFloat(totalAmount) || 0
-                          const attendeeCount = selectedAttendees.length || 1
-                          const perPerson = amount / attendeeCount
-                          const isPurchaserIncluded = selectedAttendees.includes(PURCHASER_ID)
-                          const baseText = perPerson > 0 ? `$${perPerson.toFixed(2)} per person` : undefined
-                          return baseText && !isPurchaserIncluded 
-                            ? `${baseText} · Purchaser not on expense`
-                            : baseText
-                        })()}
-                      />
-                    )}
+                    <MultiSelectAutocomplete
+                      selected={selectedAttendees}
+                      onChange={setSelectedAttendees}
+                      placeholder="Select attendees..."
+                      perPersonAmount={(() => {
+                        const amount = parseFloat(totalAmount) || 0
+                        const attendeeCount = selectedAttendees.length || 1
+                        const perPerson = amount / attendeeCount
+                        const isPurchaserIncluded = selectedAttendees.includes(PURCHASER_ID)
+                        const baseText = perPerson > 0 ? `$${perPerson.toFixed(2)} per person` : undefined
+                        return baseText && !isPurchaserIncluded 
+                          ? `${baseText} · Purchaser not on expense`
+                          : baseText
+                      })()}
+                    />
                   </div>
                 </div>
               </div>
@@ -647,139 +613,6 @@ export default function Home() {
           </div>
         </div>
       </div>
-
-      {/* Spec Guide Sheet */}
-      <Sheet open={specGuideOpen} onOpenChange={setSpecGuideOpen}>
-        <SheetContent side="right" className="w-full sm:max-w-2xl p-0 flex flex-col overflow-hidden">
-          <SheetHeader className="flex-shrink-0 bg-white border-b p-6 pb-4 flex flex-row items-center justify-between">
-            <SheetTitle className="text-2xl font-medium text-[#202022]">
-              Attendee multi-select component spec
-            </SheetTitle>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8"
-              onClick={() => setSpecGuideOpen(false)}
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </SheetHeader>
-          <div className="flex-1 overflow-y-auto p-6 space-y-6">
-            {/* Overview */}
-            <section>
-              <h2 className="text-xl font-semibold mb-4">Overview</h2>
-              <p className="text-muted-foreground">
-                The Attendees component is a searchable multi-select for managing expense attendees. It supports people search, custom attendees, purchaser rules, and automatic cost splitting.
-              </p>
-            </section>
-
-            <div className="h-px bg-border" />
-
-            {/* Basic Interaction */}
-            <section>
-              <h2 className="text-xl font-semibold mb-4">1. Basic interaction</h2>
-              <ul className="list-disc list-inside space-y-2 text-muted-foreground">
-                <li>Select the input to open search.</li>
-                <li>Type to search by name, title, email, or department (max 10 results).</li>
-                <li>Select a person to add them as a chip. The query clears automatically.</li>
-                <li>Remove a person using the chip remove button.</li>
-                <li>Selected people are excluded from search and shown in add order.</li>
-              </ul>
-            </section>
-
-            {/* Purchaser Behavior */}
-            <section>
-              <h2 className="text-xl font-semibold mb-4">2. Purchaser behavior</h2>
-              <ul className="list-disc list-inside space-y-2 text-muted-foreground">
-                <li>A purchaser is selected by default and labeled <Badge variant="secondary" className="inline-flex h-6 mx-1">Name · Purchaser</Badge>.</li>
-                <li>The purchaser cannot be removed if they are the only attendee.</li>
-                <li>If removed while others remain, helper text shows <code className="bg-muted px-1 rounded text-xs">Purchaser not on expense</code>.</li>
-                <li>Re-adding the purchaser removes the warning and places them at the bottom.</li>
-              </ul>
-            </section>
-
-            {/* Custom Attendees */}
-            <section>
-              <h2 className="text-xl font-semibold mb-4">3. Custom attendees</h2>
-              <ul className="list-disc list-inside space-y-2 text-muted-foreground">
-                <li>If there are 3 or fewer search results, show a <strong>Create new attendee</strong> option.</li>
-                <li>Selecting it creates a custom attendee from the entered name.</li>
-                <li>Custom attendees are labeled <Badge variant="secondary" className="inline-flex h-6 mx-1">Name · Custom attendee</Badge>.</li>
-                <li>Custom attendees behave like regular attendees for search, add, and remove.</li>
-              </ul>
-            </section>
-
-            {/* Visual Features */}
-            <section>
-              <h2 className="text-xl font-semibold mb-4">4. Visual behavior</h2>
-              <ul className="list-disc list-inside space-y-2 text-muted-foreground">
-                <li>Hovering an attendee chip shows a profile card with role, org, and contact info.</li>
-                <li>The input shows up to 4 attendees before scrolling.</li>
-                <li>The input can be resized vertically (50px–400px).</li>
-              </ul>
-            </section>
-
-            {/* Dynamic Calculations */}
-            <section>
-              <h2 className="text-xl font-semibold mb-4">5. Cost calculation</h2>
-              <ul className="list-disc list-inside space-y-2 text-muted-foreground">
-                <li>Helper text shows <code className="bg-muted px-1 rounded text-xs">Amount per person</code>.</li>
-                <li>Calculated as total ÷ attendee count.</li>
-                <li>Updates when attendees or total amount change.</li>
-                <li>Appends <code className="bg-muted px-1 rounded text-xs">Purchaser not on expense</code> when applicable.</li>
-              </ul>
-            </section>
-
-            {/* Ordering & Display */}
-            <section>
-              <h2 className="text-xl font-semibold mb-4">6. Ordering</h2>
-              <ul className="list-disc list-inside space-y-2 text-muted-foreground">
-                <li>Attendees render in the order added.</li>
-                <li>Re-added attendees appear last.</li>
-                <li>The list auto-scrolls to the newest addition.</li>
-              </ul>
-            </section>
-
-            {/* Technical Details */}
-            <section>
-              <h2 className="text-xl font-semibold mb-4">7. Technical details</h2>
-              
-              <h3 className="font-medium mb-3 mt-4">Data</h3>
-              <ul className="list-disc list-inside space-y-2 text-muted-foreground mb-4">
-                <li>Custom attendees persist across sessions for the same user.</li>
-              </ul>
-
-              <h3 className="font-medium mb-3">Search</h3>
-              <ul className="list-disc list-inside space-y-2 text-muted-foreground mb-4">
-                <li>Case-insensitive, real-time.</li>
-                <li>Matches name, title, email, department.</li>
-                <li>Excludes selected attendees.</li>
-              </ul>
-
-              <h3 className="font-medium mb-3">Props</h3>
-              <ul className="list-disc list-inside space-y-2 text-muted-foreground">
-                <li><code className="bg-muted px-1 rounded text-xs">selected</code>: array of attendee IDs</li>
-                <li><code className="bg-muted px-1 rounded text-xs">onChange</code>: selection callback</li>
-                <li><code className="bg-muted px-1 rounded text-xs">placeholder</code>: empty-state text</li>
-                <li><code className="bg-muted px-1 rounded text-xs">perPersonAmount</code>: helper text</li>
-                <li><code className="bg-muted px-1 rounded text-xs">usePeopleDatabase</code>: enable people search</li>
-              </ul>
-            </section>
-
-            {/* Edge Cases */}
-            <section>
-              <h2 className="text-xl font-semibold mb-4">8. Validation and edge cases</h2>
-              <ul className="list-disc list-inside space-y-2 text-muted-foreground">
-                <li>At least one attendee is always required.</li>
-                <li>The purchaser cannot be the only removable attendee.</li>
-                <li>Duplicate custom names are blocked.</li>
-                <li>Search input is trimmed before processing.</li>
-                <li>Cost calculation guards against division by zero.</li>
-              </ul>
-            </section>
-          </div>
-        </SheetContent>
-      </Sheet>
     </div>
   )
 }

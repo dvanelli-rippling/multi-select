@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Check, X, GripVertical } from "lucide-react"
+import { Check, X } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
@@ -19,8 +19,9 @@ import {
 } from "@/components/ui/popover"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { searchPeople, getAllPeople, type Person, PURCHASER_ID, createCustomAttendee, personExists } from "@/lib/people-db"
+import { searchPeople, getAllPeople, type Person, PURCHASER_ID, createCustomAttendee, personExists, getPersonById } from "@/lib/people-db"
 import { Plus } from "lucide-react"
+import { ProfileHoverCard } from "@/components/ui/profile-hover-card"
 
 export interface Option {
   value: string
@@ -156,10 +157,10 @@ export function MultiSelect({
     if (!usePeopleDatabase) return false
     const trimmedQuery = searchQuery.trim()
     if (!trimmedQuery || trimmedQuery.length === 0) return false
-    // Only show if no results found and person doesn't already exist
-    const hasNoResults = availableOptions.length === 0
+    // Show if there are 3 or fewer results and person doesn't already exist
+    const hasFewResults = availableOptions.length <= 3
     const personDoesNotExist = !personExists(trimmedQuery)
-    return hasNoResults && personDoesNotExist
+    return hasFewResults && personDoesNotExist
   }, [usePeopleDatabase, searchQuery, availableOptions])
 
   const handleCreateAttendee = () => {
@@ -236,6 +237,7 @@ export function MultiSelect({
             ref={containerRef}
             role="combobox"
             aria-expanded={open}
+            aria-controls="multi-select-popover"
             className={cn(
               "bg-white border border-[rgba(0,0,0,0.1)] rounded-lg relative",
               "flex items-start gap-2 p-4 cursor-pointer hover:border-[rgba(0,0,0,0.2)] transition-colors"
@@ -266,13 +268,28 @@ export function MultiSelect({
                   
                   // Hide remove button for purchaser if they're the only one selected
                   const isPurchaserOnly = usePeopleDatabase && value === PURCHASER_ID && selected.length === 1
+                  
+                  // Get person data for hover card (only for people database)
+                  const personData = usePeopleDatabase && isPerson ? getPersonById(value) : null
 
-                  return (
-                    <Badge
-                      key={value}
-                      variant="secondary"
-                      className="mr-1 mb-0.5 h-8 px-2 py-1 text-sm font-normal bg-secondary/50 hover:bg-secondary shrink-0"
-                    >
+                  const hoverableContent = personData ? (
+                    <ProfileHoverCard person={personData}>
+                      <div className="flex items-center">
+                        {avatarUrl || initials ? (
+                          <Avatar className="h-5 w-5 mr-1.5">
+                            {avatarUrl && (
+                              <AvatarImage src={avatarUrl} alt={label} />
+                            )}
+                            <AvatarFallback className={cn("text-xs text-white", getAvatarColor(value))}>
+                              {initials}
+                            </AvatarFallback>
+                          </Avatar>
+                        ) : null}
+                        <span className="cursor-default">{label}</span>
+                      </div>
+                    </ProfileHoverCard>
+                  ) : (
+                    <div className="flex items-center">
                       {avatarUrl || initials ? (
                         <Avatar className="h-5 w-5 mr-1.5">
                           {avatarUrl && (
@@ -283,7 +300,17 @@ export function MultiSelect({
                           </AvatarFallback>
                         </Avatar>
                       ) : null}
-                      {label}
+                      <span>{label}</span>
+                    </div>
+                  )
+
+                  return (
+                    <Badge
+                      key={value}
+                      variant="secondary"
+                      className="mr-1 mb-0.5 h-8 px-2 py-1 text-sm font-normal bg-secondary/50 hover:bg-secondary shrink-0"
+                    >
+                      {hoverableContent}
                       {!isPurchaserOnly && (
                         <button
                           className="ml-1.5 ring-offset-background rounded-full outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
@@ -311,15 +338,17 @@ export function MultiSelect({
             {/* Resize handle */}
             <div
               onMouseDown={handleResizeStart}
-              className="absolute bottom-2 right-2 w-5 h-5 cursor-ns-resize flex items-center justify-center opacity-40 hover:opacity-70 transition-opacity z-10"
+              className="absolute bottom-2 right-2 w-5 h-5 cursor-ns-resize flex items-center justify-center opacity-60 hover:opacity-80 transition-opacity z-10"
               style={{ cursor: "ns-resize" }}
               title="Drag to resize"
             >
-              <GripVertical className="h-4 w-4 rotate-90 text-muted-foreground" />
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M1 10.7143L11.2857 1M5.85714 11L11 5.85714" stroke="rgba(0,0,0,0.2)" strokeOpacity="1"/>
+              </svg>
             </div>
           </div>
         </PopoverTrigger>
-        <PopoverContent className="w-[400px] p-0" align="start">
+        <PopoverContent id="multi-select-popover" className="w-[400px] p-0" align="start">
           <Command shouldFilter={!usePeopleDatabase}>
             <CommandInput
               placeholder="Search people..."
@@ -327,27 +356,7 @@ export function MultiSelect({
               onValueChange={setSearchQuery}
             />
             <CommandList>
-              {shouldShowCreateOption ? (
-                <>
-                  <div className="px-2 py-1.5 text-sm text-muted-foreground border-b">
-                    No results found for '{searchQuery.trim()}'
-                  </div>
-                  <CommandGroup>
-                    <CommandItem
-                      onSelect={handleCreateAttendee}
-                      className="cursor-pointer"
-                    >
-                      <div className="mr-2 h-5 w-5 rounded-full bg-blue-600 flex items-center justify-center shrink-0">
-                        <Plus className="h-3 w-3 text-white" />
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="text-sm text-blue-600">Create new attendee</span>
-                        <span className="text-xs text-muted-foreground">{searchQuery.trim()}</span>
-                      </div>
-                    </CommandItem>
-                  </CommandGroup>
-                </>
-              ) : availableOptions.length > 0 ? (
+              {availableOptions.length > 0 ? (
                 <CommandGroup>
                   {availableOptions.map((item) => {
                       const isPerson = usePeopleDatabase && "fullName" in item
@@ -370,9 +379,8 @@ export function MultiSelect({
                         <CommandItem
                           key={value}
                           onSelect={() => handleSelect(value)}
-                          className="cursor-pointer"
+                          className="cursor-pointer px-3"
                         >
-                          <Check className="mr-2 h-4 w-4 opacity-0" />
                           {avatarUrl || initials ? (
                             <Avatar className="h-5 w-5 mr-2">
                               {avatarUrl && (
@@ -392,7 +400,41 @@ export function MultiSelect({
                         </CommandItem>
                       )
                     })}
+                  {shouldShowCreateOption && (
+                    <CommandItem
+                      onSelect={handleCreateAttendee}
+                      className="cursor-pointer px-3"
+                    >
+                      <div className="mr-2 h-5 w-5 rounded-full bg-blue-600 flex items-center justify-center shrink-0">
+                        <Plus className="h-3 w-3 text-white" />
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-sm text-blue-600">Create new attendee</span>
+                        <span className="text-xs text-muted-foreground">{searchQuery.trim()}</span>
+                      </div>
+                    </CommandItem>
+                  )}
+                </CommandGroup>
+              ) : shouldShowCreateOption ? (
+                <>
+                  <div className="px-2 py-1.5 text-sm text-muted-foreground border-b">
+                    No results found for &apos;{searchQuery.trim()}&apos;
+                  </div>
+                  <CommandGroup>
+                    <CommandItem
+                      onSelect={handleCreateAttendee}
+                      className="cursor-pointer px-3"
+                    >
+                      <div className="mr-2 h-5 w-5 rounded-full bg-blue-600 flex items-center justify-center shrink-0">
+                        <Plus className="h-3 w-3 text-white" />
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-sm text-blue-600">Create new attendee</span>
+                        <span className="text-xs text-muted-foreground">{searchQuery.trim()}</span>
+                      </div>
+                    </CommandItem>
                   </CommandGroup>
+                </>
               ) : (
                 <CommandEmpty>No results found.</CommandEmpty>
               )}
