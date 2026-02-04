@@ -5,8 +5,8 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true,
   },
-  // GitHub Pages uses repository name as base path
-  basePath: '/multi-select',
+  // Remove basePath if deploying to root domain, or set to '/multi-select' for subdirectory
+  // basePath: '/multi-select',
   trailingSlash: true,
 };
 
