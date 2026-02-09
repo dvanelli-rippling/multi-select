@@ -77,6 +77,26 @@ export function MultiSelectAutocomplete({
   showAvatar = true,
   processCSV = false,
 }: MultiSelectAutocompleteProps) {
+  // Validate required functions are available
+  React.useEffect(() => {
+    const requiredFunctions = {
+      searchPeople,
+      getAllPeople,
+      createCustomAttendee,
+      personExists,
+      getPersonById,
+    }
+    
+    const missingFunctions = Object.entries(requiredFunctions)
+      .filter(([name, fn]) => typeof fn !== 'function')
+      .map(([name]) => name)
+    
+    if (missingFunctions.length > 0) {
+      console.error('[MultiSelectAutocomplete] Missing required functions:', missingFunctions)
+      console.error('[MultiSelectAutocomplete] Available functions:', Object.keys(requiredFunctions))
+    }
+  }, [])
+
   const [searchQuery, setSearchQuery] = React.useState("")
   const [isFocused, setIsFocused] = React.useState(false)
   const [highlightedIndex, setHighlightedIndex] = React.useState(-1)
@@ -118,19 +138,41 @@ export function MultiSelectAutocomplete({
 
   // Get selected people - ordered by when they were added (newest last for display)
   const selectedPeople = React.useMemo(() => {
-    const allPeople = getAllPeople()
-    const peopleMap = new Map(allPeople.map((person) => [person.id, person]))
-    return selected
-      .map((id) => peopleMap.get(id))
-      .filter((person): person is Person => person !== undefined)
+    try {
+      if (typeof getAllPeople !== 'function') {
+        console.error('[MultiSelectAutocomplete] getAllPeople is not a function in selectedPeople')
+        return []
+      }
+      const allPeople = getAllPeople()
+      if (!Array.isArray(allPeople)) {
+        console.error('[MultiSelectAutocomplete] getAllPeople did not return an array in selectedPeople')
+        return []
+      }
+      const peopleMap = new Map(allPeople.map((person) => [person.id, person]))
+      return selected
+        .map((id) => peopleMap.get(id))
+        .filter((person): person is Person => person !== undefined)
+    } catch (error) {
+      console.error('[MultiSelectAutocomplete] Error in selectedPeople:', error)
+      return []
+    }
   }, [selected])
 
   // Get available options based on search query
   const availableOptions = React.useMemo(() => {
-    const results = searchQuery.trim()
-      ? searchPeople(searchQuery, selected)
-      : getAllPeople(selected)
-    return results.slice(0, 10)
+    try {
+      if (typeof searchPeople !== 'function' || typeof getAllPeople !== 'function') {
+        console.error('[MultiSelectAutocomplete] searchPeople or getAllPeople is not a function')
+        return []
+      }
+      const results = searchQuery.trim()
+        ? searchPeople(searchQuery, selected)
+        : getAllPeople(selected)
+      return Array.isArray(results) ? results.slice(0, 10) : []
+    } catch (error) {
+      console.error('[MultiSelectAutocomplete] Error in availableOptions:', error)
+      return []
+    }
   }, [searchQuery, selected])
 
   // Get autocomplete suggestion (first match)
@@ -154,12 +196,14 @@ export function MultiSelectAutocomplete({
 
   // Check if we should show "Create new attendee" option
   const shouldShowCreateOption = React.useMemo(() => {
+    // Don't show if CSV is detected
+    if (csvPeople.length > 0) return false
     const trimmedQuery = searchQuery.trim()
     if (!trimmedQuery || trimmedQuery.length === 0) return false
     const hasFewResults = availableOptions.length <= 3
     const personDoesNotExist = !personExists(trimmedQuery)
     return hasFewResults && personDoesNotExist
-  }, [searchQuery, availableOptions])
+  }, [searchQuery, availableOptions, csvPeople.length])
 
   const handleCreateAttendee = () => {
     const trimmedQuery = searchQuery.trim()
@@ -216,7 +260,7 @@ export function MultiSelectAutocomplete({
         return true
       })
     } catch (error) {
-      // Fallback if getAllPeople fails
+      console.error("Error in parseCSV:", error)
       return uniqueNames
     }
   }, [searchQuery, processCSV, selected])
@@ -230,9 +274,23 @@ export function MultiSelectAutocomplete({
   const handleAddCSVPeople = () => {
     if (csvPeople.length === 0) return
     
-    const newIds: string[] = []
     try {
+      if (typeof getAllPeople !== 'function') {
+        console.error('[MultiSelectAutocomplete] getAllPeople is not a function in handleAddCSVPeople')
+        return
+      }
+      if (typeof createCustomAttendee !== 'function') {
+        console.error('[MultiSelectAutocomplete] createCustomAttendee is not a function in handleAddCSVPeople')
+        return
+      }
+      
+      const newIds: string[] = []
       const allPeople = getAllPeople()
+      
+      if (!Array.isArray(allPeople)) {
+        console.error('[MultiSelectAutocomplete] getAllPeople did not return an array in handleAddCSVPeople')
+        return
+      }
       
       for (const name of csvPeople) {
         // First, try to find the person in the database (case-insensitive)
@@ -248,7 +306,7 @@ export function MultiSelectAutocomplete({
         } else {
           // Person doesn't exist, create as custom attendee
           const newPerson = createCustomAttendee(name)
-          if (!selected.includes(newPerson.id)) {
+          if (newPerson && newPerson.id && !selected.includes(newPerson.id)) {
             newIds.push(newPerson.id)
           }
         }
@@ -263,12 +321,23 @@ export function MultiSelectAutocomplete({
         }, 0)
       }
     } catch (error) {
-      console.error("Error adding CSV people:", error)
+      console.error('[MultiSelectAutocomplete] Error adding CSV people:', error)
     }
   }
 
   // Handle keyboard navigation
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    // Handle undo (Cmd+Z / Ctrl+Z) to clear text
+    // Check for both lowercase and uppercase 'z' for better compatibility
+    if ((e.metaKey || e.ctrlKey) && (e.key === "z" || e.key === "Z") && !e.shiftKey) {
+      e.preventDefault()
+      e.stopPropagation()
+      setSearchQuery("")
+      setCsvPeople([])
+      setHighlightedIndex(-1)
+      return
+    }
+    
     // If CSV action is available, it's at index -1
     const hasCSVAction = csvPeople.length > 0
     const totalOptions = availableOptions.length + (shouldShowCreateOption ? 1 : 0)
@@ -509,7 +578,7 @@ export function MultiSelectAutocomplete({
                 const avatarUrl = person.avatarUrl
                 const initials = getInitials(person.fullName)
                 const isPurchaserOnly = value === PURCHASER_ID && selected.length === 1
-                const personData = getPersonById(value)
+                const personData = typeof getPersonById === 'function' ? getPersonById(value) : null
 
                 const hoverableContent = personData ? (
                   <ProfileHoverCard person={personData}>
@@ -618,6 +687,19 @@ export function MultiSelectAutocomplete({
               )}
               style={{ pointerEvents: 'auto' }}
             />
+            {/* Instructional text - shows when input is empty and focused */}
+            {!searchQuery.trim() && isFocused && (
+              <div 
+                className={cn(
+                  "absolute left-0 top-0 h-8 flex items-center pointer-events-none z-0",
+                  selectedPeople.length > 0 ? "pl-0" : "px-2"
+                )}
+              >
+                <span className="text-sm text-muted-foreground/60">
+                  Search for people or paste a list
+                </span>
+              </div>
+            )}
             {/* Autocomplete suggestion overlay - only shows the suggestion part */}
             {autocompleteSuggestion && isFocused && searchQuery.trim().length > 0 && (
               <div 
@@ -689,11 +771,11 @@ export function MultiSelectAutocomplete({
                 )}
                 onMouseEnter={() => setHighlightedIndex(-1)}
               >
-                <div className="h-5 w-5 rounded-full bg-green-600 flex items-center justify-center shrink-0">
+                <div className="h-5 w-5 rounded-full bg-blue-600 flex items-center justify-center shrink-0">
                   <Plus className="h-3 w-3 text-white" />
                 </div>
                 <div className="flex flex-col flex-1 min-w-0">
-                  <span className="text-sm text-green-600 font-medium">Add {csvPeople.length} {csvPeople.length === 1 ? 'attendee' : 'attendees'}</span>
+                  <span className="text-sm text-blue-600 font-medium">Add {csvPeople.length} {csvPeople.length === 1 ? 'attendee' : 'attendees'}</span>
                   <span className="text-xs text-muted-foreground">Multiple attendees detected. We&apos;ll add them or create new attendees</span>
                 </div>
               </div>
@@ -750,7 +832,7 @@ export function MultiSelectAutocomplete({
               )
             })}
             
-            {shouldShowCreateOption && (
+            {shouldShowCreateOption && csvPeople.length === 0 && (
               <div
                 data-suggestion-index={availableOptions.length}
                 onClick={(e) => {

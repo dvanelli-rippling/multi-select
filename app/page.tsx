@@ -654,7 +654,7 @@ export default function Home() {
           <div className="flex-1 overflow-y-auto p-6 space-y-6">
             {/* Component Controls */}
             <section className="bg-muted/50 p-4 rounded-lg space-y-4">
-              <h2 className="text-lg font-semibold mb-2">Component Controls</h2>
+              <h2 className="text-lg font-semibold mb-2">Configurable props</h2>
               
               <div className="flex items-center gap-4">
                 <Label htmlFor="spec-search-mode" className="text-sm font-medium w-[180px] shrink-0">
@@ -747,7 +747,7 @@ export default function Home() {
             <section>
               <h2 className="text-xl font-semibold mb-4">Context</h2>
               <p className="text-muted-foreground">
-                This proposal extends the standard multi-select with configurable props to improve integration with HRIS people data, better support admin workflows like copy-pasting, and introduce clearer patterns for handling overflow and displaying information in a more readable way.
+                This proposal extends the standard multi-select with configurable props to improve integration with HRIS people data, better support admin workflows like copy-pasting, and introduce clearer patterns for handling overflow and displaying information more readably.
               </p>
             </section>
 
@@ -757,11 +757,13 @@ export default function Home() {
             <section>
               <h2 className="text-xl font-semibold mb-4">1. Basic interaction</h2>
               <ul className="list-disc list-inside space-y-2 text-muted-foreground">
-                <li>Select the input to open search.</li>
-                <li>Type to search by name, title, email, or department (max 10 results).</li>
-                <li>Select a person to add them as a chip. The query clears automatically.</li>
-                <li>Remove a person using the chip remove button.</li>
-                <li>Selected people are excluded from search and shown in add order.</li>
+                <li>Selecting the input opens search</li>
+                <li>Search by name, email, title, or department (max 10 results)</li>
+                <li>Selecting a result adds a chip and clears the query</li>
+                <li>Selected people are excluded from search and shown in add order</li>
+                <li>The typeahead placeholder reads: <code className="bg-muted px-1 rounded text-xs">Search for people or paste a list</code></li>
+                <li>Autocomplete suggestions appear as you type; press <code className="bg-muted px-1 rounded text-xs">Tab</code> to complete</li>
+                <li>While typing in the typeahead, <code className="bg-muted px-1 rounded text-xs">Cmd+Z</code> / <code className="bg-muted px-1 rounded text-xs">Ctrl+Z</code> clears the current query</li>
               </ul>
             </section>
 
@@ -769,10 +771,10 @@ export default function Home() {
             <section>
               <h2 className="text-xl font-semibold mb-4">2. Purchaser behavior</h2>
               <ul className="list-disc list-inside space-y-2 text-muted-foreground">
-                <li>A purchaser is selected by default and labeled <Badge variant="secondary" className="inline-flex h-6 mx-1">Name · Purchaser</Badge>.</li>
-                <li>The purchaser cannot be removed if they are the only attendee.</li>
-                <li>If removed while others remain, helper text shows <code className="bg-muted px-1 rounded text-xs">Purchaser not on expense</code>.</li>
-                <li>Re-adding the purchaser removes the warning and places them at the bottom.</li>
+                <li>A purchaser is selected by default and labeled <Badge variant="secondary" className="inline-flex h-6 mx-1">Name · Purchaser</Badge></li>
+                <li>The purchaser cannot be removed if they are the only attendee</li>
+                <li>If removed while others remain, helper text shows <code className="bg-muted px-1 rounded text-xs">Purchaser not on expense</code></li>
+                <li>Re-adding the purchaser places them at the bottom of the list</li>
               </ul>
             </section>
 
@@ -780,10 +782,10 @@ export default function Home() {
             <section>
               <h2 className="text-xl font-semibold mb-4">3. Custom attendees</h2>
               <ul className="list-disc list-inside space-y-2 text-muted-foreground">
-                <li>If there are 3 or fewer search results, show a <strong>Create new attendee</strong> option.</li>
-                <li>Selecting it creates a custom attendee from the entered name.</li>
-                <li>Custom attendees are labeled <Badge variant="secondary" className="inline-flex h-6 mx-1">Name · Custom attendee</Badge>.</li>
-                <li>Custom attendees behave like regular attendees for search, add, and remove.</li>
+                <li>When there are 3 or fewer results and no match exists, show <code className="bg-muted px-1 rounded text-xs">Create new attendee</code></li>
+                <li>Selecting it creates a custom attendee from the entered name</li>
+                <li>Custom attendees are labeled <Badge variant="secondary" className="inline-flex h-6 mx-1">Name · Custom attendee</Badge></li>
+                <li>Custom attendees behave like regular attendees for search, add, and remove</li>
               </ul>
             </section>
 
@@ -791,9 +793,9 @@ export default function Home() {
             <section>
               <h2 className="text-xl font-semibold mb-4">4. Visual behavior</h2>
               <ul className="list-disc list-inside space-y-2 text-muted-foreground">
-                <li>Hovering an attendee chip shows a profile card with role, org, and contact info.</li>
-                <li>The input shows up to 4 attendees before scrolling.</li>
-                <li>The input can be resized vertically (50px–400px).</li>
+                <li>Hovering an attendee chip shows a profile hover card</li>
+                <li>Up to 4 attendees are visible before scrolling</li>
+                <li>The input is vertically resizable (50px–400px)</li>
               </ul>
             </section>
 
@@ -801,10 +803,10 @@ export default function Home() {
             <section>
               <h2 className="text-xl font-semibold mb-4">5. Cost calculation</h2>
               <ul className="list-disc list-inside space-y-2 text-muted-foreground">
-                <li>Helper text shows <code className="bg-muted px-1 rounded text-xs">Amount per person</code>.</li>
-                <li>Calculated as total ÷ attendee count.</li>
-                <li>Updates when attendees or total amount change.</li>
-                <li>Appends <code className="bg-muted px-1 rounded text-xs">Purchaser not on expense</code> when applicable.</li>
+                <li>Helper text shows <code className="bg-muted px-1 rounded text-xs">Amount per person</code></li>
+                <li>Calculated as total ÷ attendee count</li>
+                <li>Updates when attendees or total change</li>
+                <li>Appends <code className="bg-muted px-1 rounded text-xs">Purchaser not on expense</code> when applicable</li>
               </ul>
             </section>
 
@@ -812,9 +814,9 @@ export default function Home() {
             <section>
               <h2 className="text-xl font-semibold mb-4">6. Ordering</h2>
               <ul className="list-disc list-inside space-y-2 text-muted-foreground">
-                <li>Attendees render in the order added.</li>
-                <li>Re-added attendees appear last.</li>
-                <li>The list auto-scrolls to the newest addition.</li>
+                <li>Attendees render in the order added</li>
+                <li>Re-added attendees always appear last</li>
+                <li>The list auto-scrolls to the newest addition</li>
               </ul>
             </section>
 
@@ -822,12 +824,20 @@ export default function Home() {
 
             {/* Copy-Paste Behavior */}
             <section>
-              <h2 className="text-xl font-semibold mb-4">7. Copy+paste behavior</h2>
-              <p className="text-muted-foreground mb-2">Paste a comma-separated list of names to add multiple attendees at once.</p>
+              <h2 className="text-xl font-semibold mb-4">7. Copy and paste (CSV) behavior</h2>
               <ul className="list-disc list-inside space-y-2 text-muted-foreground">
-                <li>Names can include emails in the Google Calendar format (for example, <code className="bg-muted px-1 rounded text-xs">Alex Blue &lt;a.blue@rippling.com&gt;</code>). The name is shown, and the email is stored behind the scenes.</li>
-                <li>Each name is checked against Rippling. If a match is found, that person is added. If not, a new custom attendee is created from the pasted value.</li>
-                <li>Duplicates, empty entries, and already-selected people are skipped. Select <strong>Add X attendees</strong> or press Enter to add everyone at once.</li>
+                <li>Pasting a comma-separated list triggers CSV detection</li>
+                <li>Supports simple names and Google Calendar format (<code className="bg-muted px-1 rounded text-xs">Name &lt;email&gt;</code>)</li>
+                <li>The name is displayed; the email is stored</li>
+                <li>Each value is checked against Rippling
+                  <ul className="list-disc list-inside ml-4 mt-1 space-y-1">
+                    <li>If a match exists, add that person</li>
+                    <li>If not, create a custom attendee</li>
+                  </ul>
+                </li>
+                <li>Duplicate entries, empty values, and already-selected people are skipped</li>
+                <li>Show <code className="bg-muted px-1 rounded text-xs">Add X attendees</code> to confirm adding all at once</li>
+                <li>When CSV is detected, <code className="bg-muted px-1 rounded text-xs">Create new attendee</code> is hidden</li>
               </ul>
             </section>
 
@@ -837,11 +847,10 @@ export default function Home() {
             <section>
               <h2 className="text-xl font-semibold mb-4">8. Validation and edge cases</h2>
               <ul className="list-disc list-inside space-y-2 text-muted-foreground">
-                <li>At least one attendee is always required.</li>
-                <li>The purchaser cannot be the only removable attendee.</li>
-                <li>Duplicate custom names are blocked.</li>
-                <li>Search input is trimmed before processing.</li>
-                <li>Cost calculation guards against division by zero.</li>
+                <li>The purchaser cannot be the only removable attendee</li>
+                <li>Search input is trimmed before processing</li>
+                <li>At least one attendee is required (enforced by the parent component)</li>
+                <li>Duplicate custom names are checked before creation, but identical names pasted multiple times may create separate custom attendees if no existing match is found</li>
               </ul>
             </section>
           </div>
