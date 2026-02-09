@@ -205,15 +205,20 @@ export function MultiSelectAutocomplete({
     
     // Filter out duplicates and people already selected
     const uniqueNames = Array.from(new Set(names))
-    const allPeople = getAllPeople()
-    return uniqueNames.filter(name => {
-      // Check if person exists and is already selected
-      const person = allPeople.find(p => p.fullName.toLowerCase() === name.toLowerCase())
-      if (person) {
-        return !selected.includes(person.id)
-      }
-      return true
-    })
+    try {
+      const allPeople = getAllPeople()
+      return uniqueNames.filter(name => {
+        // Check if person exists and is already selected
+        const person = allPeople.find(p => p.fullName.toLowerCase() === name.toLowerCase())
+        if (person) {
+          return !selected.includes(person.id)
+        }
+        return true
+      })
+    } catch (error) {
+      // Fallback if getAllPeople fails
+      return uniqueNames
+    }
   }, [searchQuery, processCSV, selected])
 
   // Update csvPeople when parseCSV changes
@@ -226,35 +231,39 @@ export function MultiSelectAutocomplete({
     if (csvPeople.length === 0) return
     
     const newIds: string[] = []
-    const allPeople = getAllPeople()
-    
-    for (const name of csvPeople) {
-      // First, try to find the person in the database (case-insensitive)
-      const existingPerson = allPeople.find(
-        p => p.fullName.toLowerCase() === name.toLowerCase()
-      )
+    try {
+      const allPeople = getAllPeople()
       
-      if (existingPerson) {
-        // Person exists in database, use their ID
-        if (!selected.includes(existingPerson.id)) {
-          newIds.push(existingPerson.id)
-        }
-      } else {
-        // Person doesn't exist, create as custom attendee
-        const newPerson = createCustomAttendee(name)
-        if (!selected.includes(newPerson.id)) {
-          newIds.push(newPerson.id)
+      for (const name of csvPeople) {
+        // First, try to find the person in the database (case-insensitive)
+        const existingPerson = allPeople.find(
+          p => p.fullName.toLowerCase() === name.toLowerCase()
+        )
+        
+        if (existingPerson) {
+          // Person exists in database, use their ID
+          if (!selected.includes(existingPerson.id)) {
+            newIds.push(existingPerson.id)
+          }
+        } else {
+          // Person doesn't exist, create as custom attendee
+          const newPerson = createCustomAttendee(name)
+          if (!selected.includes(newPerson.id)) {
+            newIds.push(newPerson.id)
+          }
         }
       }
-    }
-    
-    if (newIds.length > 0) {
-      onChange([...selected, ...newIds])
-      setSearchQuery("")
-      setCsvPeople([])
-      setTimeout(() => {
-        inputRef.current?.focus()
-      }, 0)
+      
+      if (newIds.length > 0) {
+        onChange([...selected, ...newIds])
+        setSearchQuery("")
+        setCsvPeople([])
+        setTimeout(() => {
+          inputRef.current?.focus()
+        }, 0)
+      }
+    } catch (error) {
+      console.error("Error adding CSV people:", error)
     }
   }
 

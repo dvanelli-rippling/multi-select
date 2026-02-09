@@ -823,11 +823,11 @@ export default function Home() {
             {/* Copy-Paste Behavior */}
             <section>
               <h2 className="text-xl font-semibold mb-4">7. Copy+paste behavior</h2>
+              <p className="text-muted-foreground mb-2">Paste a comma-separated list of names to add multiple attendees at once.</p>
               <ul className="list-disc list-inside space-y-2 text-muted-foreground">
-                <li>Paste a comma-separated list of names to add multiple attendees at once.</li>
-                <li>Names can include emails in the Google Calendar format (for example, <code className="bg-muted px-1 rounded text-xs">Dylan Vanelli &lt;dvanelli@rippling.com&gt;</code>). The name is shown, and the email is stored behind the scenes.</li>
-                <li>Each name is processed separately. Duplicates, empty entries, and already-selected people are skipped.</li>
-                <li>Select <strong>Add X attendees</strong> or press Enter to add everyone at once.</li>
+                <li>Names can include emails in the Google Calendar format (for example, <code className="bg-muted px-1 rounded text-xs">Alex Blue &lt;a.blue@rippling.com&gt;</code>). The name is shown, and the email is stored behind the scenes.</li>
+                <li>Each name is checked against Rippling. If a match is found, that person is added. If not, a new custom attendee is created from the pasted value.</li>
+                <li>Duplicates, empty entries, and already-selected people are skipped. Select <strong>Add X attendees</strong> or press Enter to add everyone at once.</li>
               </ul>
             </section>
 
