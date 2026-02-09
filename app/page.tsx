@@ -39,6 +39,10 @@ export default function Home() {
   const [usePebbleStyle, setUsePebbleStyle] = useState(false)
   const [specGuideOpen, setSpecGuideOpen] = useState(false)
   const [searchMode, setSearchMode] = useState<"dropdown" | "input">("input")
+  const [isDraggable, setIsDraggable] = useState(true)
+  const [verticalStack, setVerticalStack] = useState(true)
+  const [showAvatar, setShowAvatar] = useState(true)
+  const [processCSV, setProcessCSV] = useState(true)
   const [receiptWidth, setReceiptWidth] = useState(288)
   const [isResizing, setIsResizing] = useState(false)
   const [isFormNarrow, setIsFormNarrow] = useState(false)
@@ -100,29 +104,8 @@ export default function Home() {
   return (
     <div className={cn("min-h-screen", usePebbleStyle && "pebble-theme")} style={usePebbleStyle ? { backgroundColor: '#fafafa' } : { backgroundColor: '#fafafa' }}>
       {/* Navigation Bar - Outside Prototype */}
-      <div className="bg-white border-b border-[rgba(0,0,0,0.1)]">
-        <div className="max-w-7xl mx-auto px-12 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Label htmlFor="search-mode" className="text-sm font-normal text-foreground">
-              Search mode:
-            </Label>
-            <Select
-              value={searchMode}
-              onValueChange={(value) => {
-                if (value === "dropdown" || value === "input") {
-                  setSearchMode(value)
-                }
-              }}
-            >
-              <SelectTrigger id="search-mode" className="w-[200px] h-8 text-sm">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="input">Search in attendees input</SelectItem>
-                <SelectItem value="dropdown">Search in dropdown</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+      <div className="sticky top-0 z-50 bg-white border-b border-[rgba(0,0,0,0.1)]">
+        <div className="max-w-7xl mx-auto px-12 py-3 flex items-center">
           <Button
             variant="outline"
             size="sm"
@@ -130,7 +113,7 @@ export default function Home() {
             onClick={() => setSpecGuideOpen(true)}
           >
             <FileText className="h-4 w-4" />
-            Spec guide (Read me)
+            Multi-select spec guide
           </Button>
         </div>
       </div>
@@ -384,6 +367,10 @@ export default function Home() {
                         selected={selectedAttendees}
                         onChange={setSelectedAttendees}
                         placeholder="Select attendees..."
+                        draggable={isDraggable}
+                        verticalStack={verticalStack}
+                        showAvatar={showAvatar}
+                        processCSV={processCSV}
                         perPersonAmount={(() => {
                           const amount = parseFloat(totalAmount) || 0
                           const attendeeCount = selectedAttendees.length || 1
@@ -653,7 +640,7 @@ export default function Home() {
         <SheetContent side="right" className="w-full sm:max-w-2xl p-0 flex flex-col overflow-hidden">
           <SheetHeader className="flex-shrink-0 bg-white border-b p-6 pb-4 flex flex-row items-center justify-between">
             <SheetTitle className="text-2xl font-medium text-[#202022]">
-              Attendee multi-select component spec
+              Multi-select spec guide
             </SheetTitle>
             <Button
               variant="ghost"
@@ -665,11 +652,102 @@ export default function Home() {
             </Button>
           </SheetHeader>
           <div className="flex-1 overflow-y-auto p-6 space-y-6">
-            {/* Overview */}
+            {/* Component Controls */}
+            <section className="bg-muted/50 p-4 rounded-lg space-y-4">
+              <h2 className="text-lg font-semibold mb-2">Component Controls</h2>
+              
+              <div className="flex items-center gap-4">
+                <Label htmlFor="spec-search-mode" className="text-sm font-medium w-[180px] shrink-0">
+                  Search mode:
+                </Label>
+                <Select
+                  value={searchMode}
+                  onValueChange={(value) => {
+                    if (value === "dropdown" || value === "input") {
+                      setSearchMode(value)
+                    }
+                  }}
+                >
+                  <SelectTrigger id="spec-search-mode" className="w-[200px] h-8 text-sm">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem 
+                      value="input"
+                      className="pl-2 pr-8 [&>span:first-child]:left-auto [&>span:first-child]:right-2"
+                    >
+                      Search in input
+                    </SelectItem>
+                    <SelectItem 
+                      value="dropdown"
+                      className="pl-2 pr-8 [&>span:first-child]:left-auto [&>span:first-child]:right-2"
+                    >
+                      Search in dropdown
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="flex items-center gap-4">
+                <Label htmlFor="spec-draggable" className="text-sm font-medium w-[180px] shrink-0">
+                  Draggable (resizable):
+                </Label>
+                <div className="flex items-center gap-2">
+                  <Switch
+                    id="spec-draggable"
+                    checked={isDraggable}
+                    onCheckedChange={setIsDraggable}
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center gap-4">
+                <Label htmlFor="spec-vertical-stack" className="text-sm font-medium w-[180px] shrink-0">
+                  Vertical stacking:
+                </Label>
+                <div className="flex items-center gap-2">
+                  <Switch
+                    id="spec-vertical-stack"
+                    checked={verticalStack}
+                    onCheckedChange={setVerticalStack}
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center gap-4">
+                <Label htmlFor="spec-show-avatar" className="text-sm font-medium w-[180px] shrink-0">
+                  Show avatar:
+                </Label>
+                <div className="flex items-center gap-2">
+                  <Switch
+                    id="spec-show-avatar"
+                    checked={showAvatar}
+                    onCheckedChange={setShowAvatar}
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center gap-4">
+                <Label htmlFor="spec-process-csv" className="text-sm font-medium w-[180px] shrink-0">
+                  Process CSV:
+                </Label>
+                <div className="flex items-center gap-2">
+                  <Switch
+                    id="spec-process-csv"
+                    checked={processCSV}
+                    onCheckedChange={setProcessCSV}
+                  />
+                </div>
+              </div>
+            </section>
+
+            <div className="h-px bg-border" />
+
+            {/* Context */}
             <section>
-              <h2 className="text-xl font-semibold mb-4">Overview</h2>
+              <h2 className="text-xl font-semibold mb-4">Context</h2>
               <p className="text-muted-foreground">
-                The Attendees component is a searchable multi-select for managing expense attendees. It supports people search, custom attendees, purchaser rules, and automatic cost splitting.
+                This proposal extends the standard multi-select with configurable props to improve integration with HRIS people data, better support admin workflows like copy-pasting, and introduce clearer patterns for handling overflow and displaying information in a more readable way.
               </p>
             </section>
 
@@ -740,31 +818,20 @@ export default function Home() {
               </ul>
             </section>
 
-            {/* Technical Details */}
+            <div className="h-px bg-border" />
+
+            {/* Copy-Paste Behavior */}
             <section>
-              <h2 className="text-xl font-semibold mb-4">7. Technical details</h2>
-              
-              <h3 className="font-medium mb-3 mt-4">Data</h3>
-              <ul className="list-disc list-inside space-y-2 text-muted-foreground mb-4">
-                <li>Custom attendees persist across sessions for the same user.</li>
-              </ul>
-
-              <h3 className="font-medium mb-3">Search</h3>
-              <ul className="list-disc list-inside space-y-2 text-muted-foreground mb-4">
-                <li>Case-insensitive, real-time.</li>
-                <li>Matches name, title, email, department.</li>
-                <li>Excludes selected attendees.</li>
-              </ul>
-
-              <h3 className="font-medium mb-3">Props</h3>
+              <h2 className="text-xl font-semibold mb-4">7. Copy+paste behavior</h2>
               <ul className="list-disc list-inside space-y-2 text-muted-foreground">
-                <li><code className="bg-muted px-1 rounded text-xs">selected</code>: array of attendee IDs</li>
-                <li><code className="bg-muted px-1 rounded text-xs">onChange</code>: selection callback</li>
-                <li><code className="bg-muted px-1 rounded text-xs">placeholder</code>: empty-state text</li>
-                <li><code className="bg-muted px-1 rounded text-xs">perPersonAmount</code>: helper text</li>
-                <li><code className="bg-muted px-1 rounded text-xs">usePeopleDatabase</code>: enable people search</li>
+                <li>Paste a comma-separated list of names to add multiple attendees at once.</li>
+                <li>Names can include emails in the Google Calendar format (for example, <code className="bg-muted px-1 rounded text-xs">Dylan Vanelli &lt;dvanelli@rippling.com&gt;</code>). The name is shown, and the email is stored behind the scenes.</li>
+                <li>Each name is processed separately. Duplicates, empty entries, and already-selected people are skipped.</li>
+                <li>Select <strong>Add X attendees</strong> or press Enter to add everyone at once.</li>
               </ul>
             </section>
+
+            <div className="h-px bg-border" />
 
             {/* Edge Cases */}
             <section>

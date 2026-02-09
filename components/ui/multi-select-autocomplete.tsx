@@ -22,6 +22,10 @@ interface MultiSelectAutocompleteProps {
   placeholder?: string
   className?: string
   perPersonAmount?: string
+  draggable?: boolean
+  verticalStack?: boolean
+  showAvatar?: boolean
+  processCSV?: boolean
 }
 
 // Helper to get initials from a name
@@ -68,6 +72,10 @@ export function MultiSelectAutocomplete({
   placeholder = "Select attendees...",
   className,
   perPersonAmount,
+  draggable = true,
+  verticalStack = true,
+  showAvatar = true,
+  processCSV = false,
 }: MultiSelectAutocompleteProps) {
   const [searchQuery, setSearchQuery] = React.useState("")
   const [isFocused, setIsFocused] = React.useState(false)
@@ -75,6 +83,7 @@ export function MultiSelectAutocomplete({
   const [inputWidth, setInputWidth] = React.useState(0)
   const [height, setHeight] = React.useState(162) // Default height for 4 people
   const [isResizing, setIsResizing] = React.useState(false)
+  const [csvPeople, setCsvPeople] = React.useState<string[]>([]) // Array of full names from CSV
   const inputRef = React.useRef<HTMLInputElement>(null)
   const containerRef = React.useRef<HTMLDivElement>(null)
   const scrollContainerRef = React.useRef<HTMLDivElement>(null)
@@ -160,39 +169,156 @@ export function MultiSelectAutocomplete({
     handleSelect(newPerson.id)
   }
 
+  // Parse CSV input (handles both simple format and Google Calendar format)
+  const parseCSV = React.useMemo(() => {
+    if (!processCSV || !searchQuery.trim()) return []
+    
+    const trimmed = searchQuery.trim()
+    // Check if it looks like CSV (contains commas)
+    if (!trimmed.includes(',')) return []
+    
+    const entries = trimmed.split(',').map(entry => entry.trim()).filter(entry => entry.length > 0)
+    const names: string[] = []
+    
+    for (const entry of entries) {
+      // Handle Google Calendar format: "Name <email@domain.com>"
+      const emailMatch = entry.match(/^(.+?)\s*<[^>]+>$/);
+      if (emailMatch) {
+        // Extract name part before the email
+        const name = emailMatch[1].trim()
+        if (name) {
+          names.push(name)
+        }
+      } else {
+        // Simple format: just the name
+        // Split on whitespace to get first and last name
+        const nameParts = entry.split(/\s+/).filter(part => part.length > 0)
+        if (nameParts.length >= 2) {
+          // Has at least first and last name
+          names.push(entry.trim())
+        } else if (nameParts.length === 1) {
+          // Single word - still add it
+          names.push(entry.trim())
+        }
+      }
+    }
+    
+    // Filter out duplicates and people already selected
+    const uniqueNames = Array.from(new Set(names))
+    const allPeople = getAllPeople()
+    return uniqueNames.filter(name => {
+      // Check if person exists and is already selected
+      const person = allPeople.find(p => p.fullName.toLowerCase() === name.toLowerCase())
+      if (person) {
+        return !selected.includes(person.id)
+      }
+      return true
+    })
+  }, [searchQuery, processCSV, selected])
+
+  // Update csvPeople when parseCSV changes
+  React.useEffect(() => {
+    setCsvPeople(parseCSV)
+  }, [parseCSV])
+
+  // Handle adding all CSV people
+  const handleAddCSVPeople = () => {
+    if (csvPeople.length === 0) return
+    
+    const newIds: string[] = []
+    const allPeople = getAllPeople()
+    
+    for (const name of csvPeople) {
+      // First, try to find the person in the database (case-insensitive)
+      const existingPerson = allPeople.find(
+        p => p.fullName.toLowerCase() === name.toLowerCase()
+      )
+      
+      if (existingPerson) {
+        // Person exists in database, use their ID
+        if (!selected.includes(existingPerson.id)) {
+          newIds.push(existingPerson.id)
+        }
+      } else {
+        // Person doesn't exist, create as custom attendee
+        const newPerson = createCustomAttendee(name)
+        if (!selected.includes(newPerson.id)) {
+          newIds.push(newPerson.id)
+        }
+      }
+    }
+    
+    if (newIds.length > 0) {
+      onChange([...selected, ...newIds])
+      setSearchQuery("")
+      setCsvPeople([])
+      setTimeout(() => {
+        inputRef.current?.focus()
+      }, 0)
+    }
+  }
+
   // Handle keyboard navigation
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    // If CSV action is available, it's at index -1
+    const hasCSVAction = csvPeople.length > 0
     const totalOptions = availableOptions.length + (shouldShowCreateOption ? 1 : 0)
+    const totalWithCSV = totalOptions + (hasCSVAction ? 1 : 0)
     
     if (e.key === "ArrowDown") {
       e.preventDefault()
-      setHighlightedIndex((prev) => (prev < totalOptions - 1 ? prev + 1 : prev))
+      setHighlightedIndex((prev) => {
+        if (hasCSVAction && prev === -1) {
+          return 0 // Move from CSV action to first option
+        }
+        return prev < totalOptions - 1 ? prev + 1 : prev
+      })
     } else if (e.key === "ArrowUp") {
       e.preventDefault()
-      setHighlightedIndex((prev) => (prev > 0 ? prev - 1 : -1))
+      setHighlightedIndex((prev) => {
+        if (prev === 0 && hasCSVAction) {
+          return -1 // Move from first option to CSV action
+        }
+        return prev > 0 ? prev - 1 : (hasCSVAction ? -1 : 0)
+      })
     } else if (e.key === "Tab") {
       e.preventDefault()
-      // If there's a highlighted index, use that; otherwise use the first option
-      if (highlightedIndex >= 0) {
+      // If there's a highlighted index, use that
+      if (highlightedIndex === -1 && hasCSVAction) {
+        handleAddCSVPeople()
+      } else if (highlightedIndex >= 0) {
         if (highlightedIndex < availableOptions.length) {
           const option = availableOptions[highlightedIndex]
           handleSelect(option.id)
         } else if (shouldShowCreateOption) {
           handleCreateAttendee()
         }
+      } else if (hasCSVAction) {
+        // If CSV is available and nothing highlighted, use CSV action
+        handleAddCSVPeople()
       } else if (availableOptions.length > 0 && autocompleteSuggestion) {
         // Accept the autocomplete suggestion
         handleSelect(availableOptions[0].id)
       } else if (shouldShowCreateOption) {
         handleCreateAttendee()
       }
-    } else if (e.key === "Enter" && highlightedIndex >= 0) {
+    } else if (e.key === "Enter") {
       e.preventDefault()
-      if (highlightedIndex < availableOptions.length) {
-        const option = availableOptions[highlightedIndex]
-        handleSelect(option.id)
+      // If CSV is detected and available, process it first
+      if (hasCSVAction) {
+        handleAddCSVPeople()
+      } else if (highlightedIndex >= 0) {
+        if (highlightedIndex < availableOptions.length) {
+          const option = availableOptions[highlightedIndex]
+          handleSelect(option.id)
+        } else if (shouldShowCreateOption) {
+          handleCreateAttendee()
+        }
       } else if (shouldShowCreateOption) {
         handleCreateAttendee()
+      } else if (availableOptions.length > 0 && autocompleteSuggestion) {
+        // Accept the autocomplete suggestion
+        handleSelect(availableOptions[0].id)
       }
     } else if (e.key === "Escape") {
       setSearchQuery("")
@@ -359,7 +485,10 @@ export function MultiSelectAutocomplete({
           }}
         >
           {selectedPeople.length > 0 ? (
-            <div className="flex flex-col items-start gap-1.5 w-full">
+            <div className={cn(
+              "flex items-start gap-1.5 w-full",
+              verticalStack ? "flex-col" : "flex-wrap"
+            )}>
               {selectedPeople.map((person) => {
                 const value = person.id
                 const baseLabel = person.fullName
@@ -376,7 +505,7 @@ export function MultiSelectAutocomplete({
                 const hoverableContent = personData ? (
                   <ProfileHoverCard person={personData}>
                     <div className="flex items-center">
-                      {avatarUrl || initials ? (
+                      {showAvatar && (avatarUrl || initials) ? (
                         <Avatar className="h-5 w-5 mr-1.5">
                           {avatarUrl && <AvatarImage src={avatarUrl} alt={label} />}
                           <AvatarFallback className={cn("text-xs text-white", getAvatarColor(value))}>
@@ -389,7 +518,7 @@ export function MultiSelectAutocomplete({
                   </ProfileHoverCard>
                 ) : (
                   <div className="flex items-center">
-                    {avatarUrl || initials ? (
+                    {showAvatar && (avatarUrl || initials) ? (
                       <Avatar className="h-5 w-5 mr-1.5">
                         {avatarUrl && <AvatarImage src={avatarUrl} alt={label} />}
                         <AvatarFallback className={cn("text-xs text-white", getAvatarColor(value))}>
@@ -500,89 +629,89 @@ export function MultiSelectAutocomplete({
             )}
           </div>
           
-          {/* Resize handle */}
-          <div
-            onMouseDown={(e) => {
-              e.stopPropagation()
-              handleResizeStart(e)
-            }}
-            onClick={(e) => e.stopPropagation()}
-            className="absolute bottom-2 right-2 w-5 h-5 cursor-ns-resize flex items-center justify-center opacity-60 hover:opacity-80 transition-opacity z-30"
-            style={{ cursor: "ns-resize" }}
-            title="Drag to resize"
-          >
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M1 10.7143L11.2857 1M5.85714 11L11 5.85714" stroke="rgba(0,0,0,0.2)" strokeOpacity="1"/>
-            </svg>
-          </div>
-
-          {/* Suggestions dropdown */}
-          {isFocused && (searchQuery.trim().length > 0 ? (availableOptions.length > 0 || shouldShowCreateOption) : availableOptions.length > 0) && (
+          {/* Resize handle - only show if draggable is enabled */}
+          {draggable && (
             <div
-              ref={suggestionsRef}
-              className="absolute top-full left-0 right-0 mt-1 bg-white border border-[rgba(0,0,0,0.1)] rounded-lg shadow-lg z-50 max-h-[300px] overflow-y-auto"
               onMouseDown={(e) => {
-                // Prevent input blur when clicking on dropdown
-                e.preventDefault()
+                e.stopPropagation()
+                handleResizeStart(e)
               }}
+              onClick={(e) => e.stopPropagation()}
+              className="absolute bottom-2 right-2 w-5 h-5 cursor-ns-resize flex items-center justify-center opacity-60 hover:opacity-80 transition-opacity z-30"
+              style={{ cursor: "ns-resize" }}
+              title="Drag to resize"
             >
-              {availableOptions.map((person, index) => {
-                const value = person.id
-                const baseLabel = person.fullName
-                const label = person.isPurchaser
-                  ? `${baseLabel} · Purchaser`
-                  : person.isCustom
-                  ? `${baseLabel} · Custom attendee`
-                  : baseLabel
-                const subtitle = person.jobTitle
-                const avatarUrl = person.avatarUrl
-                const initials = getInitials(person.fullName)
-                const isHighlighted = highlightedIndex === index
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M1 10.7143L11.2857 1M5.85714 11L11 5.85714" stroke="rgba(0,0,0,0.2)" strokeOpacity="1"/>
+              </svg>
+            </div>
+          )}
+        </div>
 
-                return (
-                  <div
-                    key={value}
-                    data-suggestion-index={index}
-                    onClick={(e) => {
-                      e.preventDefault()
-                      e.stopPropagation()
-                      handleSelect(value)
-                    }}
-                    onMouseDown={(e) => {
-                      e.preventDefault()
-                      e.stopPropagation()
-                    }}
-                    className={cn(
-                      "flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-muted",
-                      isHighlighted && "bg-muted"
-                    )}
-                    onMouseEnter={() => setHighlightedIndex(index)}
-                  >
-                    {avatarUrl || initials ? (
-                      <Avatar className="h-5 w-5 shrink-0">
-                        {avatarUrl && <AvatarImage src={avatarUrl} alt={label} />}
-                        <AvatarFallback className={cn("text-xs text-white", getAvatarColor(value))}>
-                          {initials}
-                        </AvatarFallback>
-                      </Avatar>
-                    ) : null}
-                    <div className="flex flex-col min-w-0">
-                      <span className="text-sm">{label}</span>
-                      {subtitle && !person.isPurchaser && !person.isCustom && (
-                        <span className="text-xs text-muted-foreground truncate">{subtitle}</span>
-                      )}
-                    </div>
-                  </div>
-                )
-              })}
-              
-              {shouldShowCreateOption && (
+          {/* Suggestions dropdown - positioned relative to container */}
+        {isFocused && (
+          (csvPeople.length > 0) ||
+          (searchQuery.trim().length > 0 ? (availableOptions.length > 0 || shouldShowCreateOption) : availableOptions.length > 0)
+        ) && (
+          <div
+            ref={suggestionsRef}
+            className="absolute top-full left-0 right-0 mt-1 bg-white border border-[rgba(0,0,0,0.1)] rounded-lg shadow-lg z-50 max-h-[300px] overflow-y-auto"
+            onMouseDown={(e) => {
+              // Prevent input blur when clicking on dropdown
+              e.preventDefault()
+            }}
+          >
+            {/* CSV Summary Action */}
+            {csvPeople.length > 0 && (
+              <div
+                data-suggestion-index={-1}
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  handleAddCSVPeople()
+                }}
+                onMouseDown={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                }}
+                className={cn(
+                  "flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-muted border-b border-[rgba(0,0,0,0.1)]",
+                  highlightedIndex === -1 && "bg-muted"
+                )}
+                onMouseEnter={() => setHighlightedIndex(-1)}
+              >
+                <div className="h-5 w-5 rounded-full bg-green-600 flex items-center justify-center shrink-0">
+                  <Plus className="h-3 w-3 text-white" />
+                </div>
+                <div className="flex flex-col flex-1 min-w-0">
+                  <span className="text-sm text-green-600 font-medium">Add {csvPeople.length} {csvPeople.length === 1 ? 'attendee' : 'attendees'}</span>
+                  <span className="text-xs text-muted-foreground">Multiple attendees detected. We&apos;ll add them or create new attendees</span>
+                </div>
+              </div>
+            )}
+            
+            {/* Regular suggestions */}
+            {availableOptions.map((person, index) => {
+              const value = person.id
+              const baseLabel = person.fullName
+              const label = person.isPurchaser
+                ? `${baseLabel} · Purchaser`
+                : person.isCustom
+                ? `${baseLabel} · Custom attendee`
+                : baseLabel
+              const subtitle = person.jobTitle
+              const avatarUrl = person.avatarUrl
+              const initials = getInitials(person.fullName)
+              const isHighlighted = highlightedIndex === index
+
+              return (
                 <div
-                  data-suggestion-index={availableOptions.length}
+                  key={value}
+                  data-suggestion-index={index}
                   onClick={(e) => {
                     e.preventDefault()
                     e.stopPropagation()
-                    handleCreateAttendee()
+                    handleSelect(value)
                   }}
                   onMouseDown={(e) => {
                     e.preventDefault()
@@ -590,22 +719,57 @@ export function MultiSelectAutocomplete({
                   }}
                   className={cn(
                     "flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-muted",
-                    highlightedIndex === availableOptions.length && "bg-muted"
+                    isHighlighted && "bg-muted"
                   )}
-                  onMouseEnter={() => setHighlightedIndex(availableOptions.length)}
+                  onMouseEnter={() => setHighlightedIndex(index)}
                 >
-                  <div className="h-5 w-5 rounded-full bg-blue-600 flex items-center justify-center shrink-0">
-                    <Plus className="h-3 w-3 text-white" />
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-sm text-blue-600">Create new attendee</span>
-                    <span className="text-xs text-muted-foreground">{searchQuery.trim()}</span>
+                  {showAvatar && (avatarUrl || initials) ? (
+                    <Avatar className="h-5 w-5 shrink-0">
+                      {avatarUrl && <AvatarImage src={avatarUrl} alt={label} />}
+                      <AvatarFallback className={cn("text-xs text-white", getAvatarColor(value))}>
+                        {initials}
+                      </AvatarFallback>
+                    </Avatar>
+                  ) : null}
+                  <div className="flex flex-col min-w-0">
+                    <span className="text-sm">{label}</span>
+                    {subtitle && !person.isPurchaser && !person.isCustom && (
+                      <span className="text-xs text-muted-foreground truncate">{subtitle}</span>
+                    )}
                   </div>
                 </div>
-              )}
-            </div>
-          )}
-        </div>
+              )
+            })}
+            
+            {shouldShowCreateOption && (
+              <div
+                data-suggestion-index={availableOptions.length}
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  handleCreateAttendee()
+                }}
+                onMouseDown={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                }}
+                className={cn(
+                  "flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-muted",
+                  highlightedIndex === availableOptions.length && "bg-muted"
+                )}
+                onMouseEnter={() => setHighlightedIndex(availableOptions.length)}
+              >
+                <div className="h-5 w-5 rounded-full bg-blue-600 flex items-center justify-center shrink-0">
+                  <Plus className="h-3 w-3 text-white" />
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-sm text-blue-600">Create new attendee</span>
+                  <span className="text-xs text-muted-foreground">{searchQuery.trim()}</span>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </div>
       
       {perPersonAmount && (
