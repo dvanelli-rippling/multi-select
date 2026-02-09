@@ -105,7 +105,7 @@ export default function Home() {
     <div className={cn("min-h-screen", usePebbleStyle && "pebble-theme")} style={usePebbleStyle ? { backgroundColor: '#fafafa' } : { backgroundColor: '#fafafa' }}>
       {/* Navigation Bar - Outside Prototype */}
       <div className="sticky top-0 z-50 bg-white border-b border-[rgba(0,0,0,0.1)]">
-        <div className="max-w-7xl mx-auto px-12 py-3 flex items-center">
+        <div className="max-w-7xl mx-auto px-12 py-3 flex items-center justify-end">
           <Button
             variant="outline"
             size="sm"
