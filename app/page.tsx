@@ -793,7 +793,7 @@ export default function Home() {
             <section>
               <h2 className="text-xl font-semibold mb-4">4. Visual behavior</h2>
               <ul className="list-disc list-inside space-y-2 text-muted-foreground">
-                <li>Hovering an attendee chip shows a profile hover card</li>
+                <li>Hovering an attendee chip shows a profile card with role, org, and contact info</li>
                 <li>Up to 4 attendees are visible before scrolling</li>
                 <li>The input is vertically resizable (50px–400px)</li>
               </ul>
@@ -829,13 +829,9 @@ export default function Home() {
                 <li>Pasting a comma-separated list triggers CSV detection</li>
                 <li>Supports simple names and Google Calendar format (<code className="bg-muted px-1 rounded text-xs">Name &lt;email&gt;</code>)</li>
                 <li>The name is displayed; the email is stored</li>
-                <li>Each value is checked against Rippling
-                  <ul className="list-disc list-inside ml-4 mt-1 space-y-1">
-                    <li>If a match exists, add that person</li>
-                    <li>If not, create a custom attendee</li>
-                  </ul>
-                </li>
-                <li>Duplicate entries, empty values, and already-selected people are skipped</li>
+                <li>Each value is matched against Rippling, adding an existing person when found or creating a custom attendee otherwise.</li>
+                <li>Repeated names in a pasted list are added once, even if they use different capitalization (for example, <code className="bg-muted px-1 rounded text-xs">john doe</code> and <code className="bg-muted px-1 rounded text-xs">John Doe</code>).</li>
+                <li>Empty entries and already-selected people are skipped</li>
                 <li>Show <code className="bg-muted px-1 rounded text-xs">Add X attendees</code> to confirm adding all at once</li>
                 <li>When CSV is detected, <code className="bg-muted px-1 rounded text-xs">Create new attendee</code> is hidden</li>
               </ul>
@@ -850,7 +846,7 @@ export default function Home() {
                 <li>The purchaser cannot be the only removable attendee</li>
                 <li>Search input is trimmed before processing</li>
                 <li>At least one attendee is required (enforced by the parent component)</li>
-                <li>Duplicate custom names are checked before creation, but identical names pasted multiple times may create separate custom attendees if no existing match is found</li>
+                <li>Attendees added with only a single name are invalid. Show inline validation: <code className="bg-muted px-1 rounded text-xs">Remove this attendee and enter a full name</code></li>
               </ul>
             </section>
           </div>

@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { X, Plus } from "lucide-react"
+import { X, Plus, AlertTriangle } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -15,6 +15,7 @@ import {
   getPersonById 
 } from "@/lib/people-db"
 import { ProfileHoverCard } from "@/components/ui/profile-hover-card"
+import { HoverCard, HoverCardTrigger, HoverCardContent } from "@/components/ui/hover-card"
 
 interface MultiSelectAutocompleteProps {
   selected: string[]
@@ -570,9 +571,11 @@ export function MultiSelectAutocomplete({
               {selectedPeople.map((person) => {
                 const value = person.id
                 const baseLabel = person.fullName
+                // Check if name is only a first name (single word, no spaces) - only validate custom attendees
+                const isOnlyFirstName = person.isCustom && baseLabel.trim().split(/\s+/).length === 1
                 const label = person.isPurchaser
                   ? `${baseLabel} · Purchaser`
-                  : person.isCustom
+                  : person.isCustom && !isOnlyFirstName
                   ? `${baseLabel} · Custom attendee`
                   : baseLabel
                 const avatarUrl = person.avatarUrl
@@ -580,32 +583,41 @@ export function MultiSelectAutocomplete({
                 const isPurchaserOnly = value === PURCHASER_ID && selected.length === 1
                 const personData = typeof getPersonById === 'function' ? getPersonById(value) : null
 
-                const hoverableContent = personData ? (
-                  <ProfileHoverCard person={personData}>
-                    <div className="flex items-center">
-                      {showAvatar && (avatarUrl || initials) ? (
-                        <Avatar className="h-5 w-5 mr-1.5">
-                          {avatarUrl && <AvatarImage src={avatarUrl} alt={label} />}
-                          <AvatarFallback className={cn("text-xs text-white", getAvatarColor(value))}>
-                            {initials}
-                          </AvatarFallback>
-                        </Avatar>
-                      ) : null}
-                      <span className="cursor-default">{label}</span>
-                    </div>
-                  </ProfileHoverCard>
-                ) : (
+                // If there's an error, wrap the entire chip content in error tooltip
+                // Otherwise, show the profile hover card if available
+                const chipContent = (
                   <div className="flex items-center">
-                    {showAvatar && (avatarUrl || initials) ? (
+                    {showAvatar && !isOnlyFirstName && (avatarUrl || initials) ? (
                       <Avatar className="h-5 w-5 mr-1.5">
                         {avatarUrl && <AvatarImage src={avatarUrl} alt={label} />}
                         <AvatarFallback className={cn("text-xs text-white", getAvatarColor(value))}>
                           {initials}
                         </AvatarFallback>
                       </Avatar>
+                    ) : isOnlyFirstName ? (
+                      <div className="h-5 w-5 mr-1.5 flex items-center justify-center">
+                        <AlertTriangle className="h-4 w-4 text-destructive" />
+                      </div>
                     ) : null}
-                    <span>{label}</span>
+                    <span className={personData && !isOnlyFirstName ? "cursor-default" : ""}>{label}</span>
                   </div>
+                )
+
+                const hoverableContent = isOnlyFirstName ? (
+                  <HoverCard>
+                    <HoverCardTrigger asChild>
+                      {chipContent}
+                    </HoverCardTrigger>
+                    <HoverCardContent className="w-auto p-2">
+                      <p className="text-sm">Remove this attendee and enter a full name</p>
+                    </HoverCardContent>
+                  </HoverCard>
+                ) : personData ? (
+                  <ProfileHoverCard person={personData}>
+                    {chipContent}
+                  </ProfileHoverCard>
+                ) : (
+                  chipContent
                 )
 
                 return (
