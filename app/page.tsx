@@ -657,37 +657,39 @@ export default function Home() {
             <section className="bg-muted/50 p-4 rounded-lg space-y-4">
               <h2 className="text-lg font-semibold mb-2">Configurable props</h2>
               
-              <div className="flex items-center gap-4">
-                <Label htmlFor="spec-platform" className="text-sm font-medium w-[180px] shrink-0">
-                  Platform:
-                </Label>
-                <Select
-                  value={platform}
-                  onValueChange={(value) => {
-                    if (value === "web" || value === "mobile") {
-                      setPlatform(value)
-                    }
-                  }}
-                >
-                  <SelectTrigger id="spec-platform" className="w-[200px] h-8 text-sm">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem 
-                      value="web"
-                      className="pl-2 pr-8 [&>span:first-child]:left-auto [&>span:first-child]:right-2"
-                    >
-                      Web
-                    </SelectItem>
-                    <SelectItem 
-                      value="mobile"
-                      className="pl-2 pr-8 [&>span:first-child]:left-auto [&>span:first-child]:right-2"
-                    >
-                      Mobile
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+              {process.env.NEXT_PUBLIC_GITHUB_PAGES !== 'true' && (
+                <div className="flex items-center gap-4">
+                  <Label htmlFor="spec-platform" className="text-sm font-medium w-[180px] shrink-0">
+                    Platform:
+                  </Label>
+                  <Select
+                    value={platform}
+                    onValueChange={(value) => {
+                      if (value === "web" || value === "mobile") {
+                        setPlatform(value)
+                      }
+                    }}
+                  >
+                    <SelectTrigger id="spec-platform" className="w-[200px] h-8 text-sm">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem 
+                        value="web"
+                        className="pl-2 pr-8 [&>span:first-child]:left-auto [&>span:first-child]:right-2"
+                      >
+                        Web
+                      </SelectItem>
+                      <SelectItem 
+                        value="mobile"
+                        className="pl-2 pr-8 [&>span:first-child]:left-auto [&>span:first-child]:right-2"
+                      >
+                        Mobile
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
 
               <div className="flex items-center gap-4">
                 <Label htmlFor="spec-search-mode" className="text-sm font-medium w-[180px] shrink-0">
