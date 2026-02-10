@@ -43,6 +43,7 @@ export default function Home() {
   const [verticalStack, setVerticalStack] = useState(true)
   const [showAvatar, setShowAvatar] = useState(true)
   const [processCSV, setProcessCSV] = useState(true)
+  const [platform, setPlatform] = useState<"web" | "mobile">("web")
   const [receiptWidth, setReceiptWidth] = useState(288)
   const [isResizing, setIsResizing] = useState(false)
   const [isFormNarrow, setIsFormNarrow] = useState(false)
@@ -657,6 +658,38 @@ export default function Home() {
               <h2 className="text-lg font-semibold mb-2">Configurable props</h2>
               
               <div className="flex items-center gap-4">
+                <Label htmlFor="spec-platform" className="text-sm font-medium w-[180px] shrink-0">
+                  Platform:
+                </Label>
+                <Select
+                  value={platform}
+                  onValueChange={(value) => {
+                    if (value === "web" || value === "mobile") {
+                      setPlatform(value)
+                    }
+                  }}
+                >
+                  <SelectTrigger id="spec-platform" className="w-[200px] h-8 text-sm">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem 
+                      value="web"
+                      className="pl-2 pr-8 [&>span:first-child]:left-auto [&>span:first-child]:right-2"
+                    >
+                      Web
+                    </SelectItem>
+                    <SelectItem 
+                      value="mobile"
+                      className="pl-2 pr-8 [&>span:first-child]:left-auto [&>span:first-child]:right-2"
+                    >
+                      Mobile
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="flex items-center gap-4">
                 <Label htmlFor="spec-search-mode" className="text-sm font-medium w-[180px] shrink-0">
                   Search mode:
                 </Label>
@@ -743,112 +776,424 @@ export default function Home() {
 
             <div className="h-px bg-border" />
 
-            {/* Context */}
-            <section>
-              <h2 className="text-xl font-semibold mb-4">Context</h2>
-              <p className="text-muted-foreground">
-                This proposal extends the standard multi-select with configurable props to improve integration with HRIS people data, better support admin workflows like copy-pasting, and introduce clearer patterns for handling overflow and displaying information more readably.
-              </p>
-            </section>
+            {platform === "web" ? (
+              <>
+                {/* Context */}
+                <section>
+                  <h2 className="text-xl font-semibold mb-4">Context</h2>
+                  <p className="text-muted-foreground">
+                    This proposal extends the standard multi-select with configurable props to improve integration with HRIS people data, better support admin workflows like copy-pasting, and introduce clearer patterns for handling overflow and displaying information more readably.
+                  </p>
+                </section>
 
-            <div className="h-px bg-border" />
+                <div className="h-px bg-border" />
 
-            {/* Basic Interaction */}
-            <section>
-              <h2 className="text-xl font-semibold mb-4">1. Basic interaction</h2>
-              <ul className="list-disc list-inside space-y-2 text-muted-foreground">
-                <li>Selecting the input opens search</li>
-                <li>Search by name, email, title, or department (max 10 results)</li>
-                <li>Selecting a result adds a chip and clears the query</li>
-                <li>Selected people are excluded from search and shown in add order</li>
-                <li>The typeahead placeholder reads: <code className="bg-muted px-1 rounded text-xs">Search for people or paste a list</code></li>
-                <li>Autocomplete suggestions appear as you type; press <code className="bg-muted px-1 rounded text-xs">Tab</code> to complete</li>
-                <li>While typing in the typeahead, <code className="bg-muted px-1 rounded text-xs">Cmd+Z</code> / <code className="bg-muted px-1 rounded text-xs">Ctrl+Z</code> clears the current query</li>
-              </ul>
-            </section>
+                {/* Basic Interaction */}
+                <section>
+                  <h2 className="text-xl font-semibold mb-4">1. Basic interaction</h2>
+                  <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+                    <li>Selecting the input opens search</li>
+                    <li>Search by name, email, title, or department (max 10 results)</li>
+                    <li>Selecting a result adds a chip and clears the query</li>
+                    <li>Selected people are excluded from search and shown in add order</li>
+                    <li>The typeahead placeholder reads: <code className="bg-muted px-1 rounded text-xs">Search for people or paste a list</code></li>
+                    <li>Autocomplete suggestions appear as you type; press <code className="bg-muted px-1 rounded text-xs">Tab</code> to complete</li>
+                    <li>While typing in the typeahead, <code className="bg-muted px-1 rounded text-xs">Cmd+Z</code> / <code className="bg-muted px-1 rounded text-xs">Ctrl+Z</code> clears the current query</li>
+                  </ul>
+                </section>
 
-            {/* Purchaser Behavior */}
-            <section>
-              <h2 className="text-xl font-semibold mb-4">2. Purchaser behavior</h2>
-              <ul className="list-disc list-inside space-y-2 text-muted-foreground">
-                <li>A purchaser is selected by default and labeled <Badge variant="secondary" className="inline-flex h-6 mx-1">Name · Purchaser</Badge></li>
-                <li>The purchaser cannot be removed if they are the only attendee</li>
-                <li>If removed while others remain, helper text shows <code className="bg-muted px-1 rounded text-xs">Purchaser not on expense</code></li>
-                <li>Re-adding the purchaser places them at the bottom of the list</li>
-              </ul>
-            </section>
+                {/* Purchaser Behavior */}
+                <section>
+                  <h2 className="text-xl font-semibold mb-4">2. Purchaser behavior</h2>
+                  <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+                    <li>A purchaser is selected by default and labeled <Badge variant="secondary" className="inline-flex h-6 mx-1">Name · Purchaser</Badge></li>
+                    <li>The purchaser cannot be removed if they are the only attendee</li>
+                    <li>If removed while others remain, helper text shows <code className="bg-muted px-1 rounded text-xs">Purchaser not on expense</code></li>
+                    <li>Re-adding the purchaser places them at the bottom of the list</li>
+                  </ul>
+                </section>
 
-            {/* Custom Attendees */}
-            <section>
-              <h2 className="text-xl font-semibold mb-4">3. Custom attendees</h2>
-              <ul className="list-disc list-inside space-y-2 text-muted-foreground">
-                <li>When there are 3 or fewer results and no match exists, show <code className="bg-muted px-1 rounded text-xs">Create new attendee</code></li>
-                <li>Selecting it creates a custom attendee from the entered name</li>
-                <li>Custom attendees are labeled <Badge variant="secondary" className="inline-flex h-6 mx-1">Name · Custom attendee</Badge></li>
-                <li>Custom attendees behave like regular attendees for search, add, and remove</li>
-              </ul>
-            </section>
+                {/* Custom Attendees */}
+                <section>
+                  <h2 className="text-xl font-semibold mb-4">3. Custom attendees</h2>
+                  <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+                    <li>When there are 3 or fewer results and no match exists, show <code className="bg-muted px-1 rounded text-xs">Create new attendee</code></li>
+                    <li>Selecting it creates a custom attendee from the entered name</li>
+                    <li>Custom attendees are labeled <Badge variant="secondary" className="inline-flex h-6 mx-1">Name · Custom attendee</Badge></li>
+                    <li>Custom attendees behave like regular attendees for search, add, and remove</li>
+                  </ul>
+                </section>
 
-            {/* Visual Features */}
-            <section>
-              <h2 className="text-xl font-semibold mb-4">4. Visual behavior</h2>
-              <ul className="list-disc list-inside space-y-2 text-muted-foreground">
-                <li>Hovering an attendee chip shows a profile card with role, org, and contact info</li>
-                <li>Up to 4 attendees are visible before scrolling</li>
-                <li>The input is vertically resizable (50px–400px)</li>
-              </ul>
-            </section>
+                {/* Visual Features */}
+                <section>
+                  <h2 className="text-xl font-semibold mb-4">4. Visual behavior</h2>
+                  <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+                    <li>Hovering an attendee chip shows a profile card with role, org, and contact info</li>
+                    <li>Up to 4 attendees are visible before scrolling</li>
+                    <li>The input is vertically resizable (50px–400px)</li>
+                  </ul>
+                </section>
 
-            {/* Dynamic Calculations */}
-            <section>
-              <h2 className="text-xl font-semibold mb-4">5. Cost calculation</h2>
-              <ul className="list-disc list-inside space-y-2 text-muted-foreground">
-                <li>Helper text shows <code className="bg-muted px-1 rounded text-xs">Amount per person</code></li>
-                <li>Calculated as total ÷ attendee count</li>
-                <li>Updates when attendees or total change</li>
-                <li>Appends <code className="bg-muted px-1 rounded text-xs">Purchaser not on expense</code> when applicable</li>
-              </ul>
-            </section>
+                {/* Dynamic Calculations */}
+                <section>
+                  <h2 className="text-xl font-semibold mb-4">5. Cost calculation</h2>
+                  <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+                    <li>Helper text shows <code className="bg-muted px-1 rounded text-xs">Amount per person</code></li>
+                    <li>Calculated as total ÷ attendee count</li>
+                    <li>Updates when attendees or total change</li>
+                    <li>Appends <code className="bg-muted px-1 rounded text-xs">Purchaser not on expense</code> when applicable</li>
+                  </ul>
+                </section>
 
-            {/* Ordering & Display */}
-            <section>
-              <h2 className="text-xl font-semibold mb-4">6. Ordering</h2>
-              <ul className="list-disc list-inside space-y-2 text-muted-foreground">
-                <li>Attendees render in the order added</li>
-                <li>Re-added attendees always appear last</li>
-                <li>The list auto-scrolls to the newest addition</li>
-              </ul>
-            </section>
+                {/* Ordering & Display */}
+                <section>
+                  <h2 className="text-xl font-semibold mb-4">6. Ordering</h2>
+                  <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+                    <li>Attendees render in the order added</li>
+                    <li>Re-added attendees always appear last</li>
+                    <li>The list auto-scrolls to the newest addition</li>
+                  </ul>
+                </section>
 
-            <div className="h-px bg-border" />
+                <div className="h-px bg-border" />
 
-            {/* Copy-Paste Behavior */}
-            <section>
-              <h2 className="text-xl font-semibold mb-4">7. Copy and paste (CSV) behavior</h2>
-              <ul className="list-disc list-inside space-y-2 text-muted-foreground">
-                <li>Pasting a comma-separated list triggers CSV detection</li>
-                <li>Supports simple names and Google Calendar format (<code className="bg-muted px-1 rounded text-xs">Name &lt;email&gt;</code>)</li>
-                <li>The name is displayed; the email is stored</li>
-                <li>Each value is matched against Rippling, adding an existing person when found or creating a custom attendee otherwise.</li>
-                <li>Repeated names in a pasted list are added once, even if they use different capitalization (for example, <code className="bg-muted px-1 rounded text-xs">john doe</code> and <code className="bg-muted px-1 rounded text-xs">John Doe</code>).</li>
-                <li>Empty entries and already-selected people are skipped</li>
-                <li>Show <code className="bg-muted px-1 rounded text-xs">Add X attendees</code> to confirm adding all at once</li>
-                <li>When CSV is detected, <code className="bg-muted px-1 rounded text-xs">Create new attendee</code> is hidden</li>
-              </ul>
-            </section>
+                {/* Copy-Paste Behavior */}
+                <section>
+                  <h2 className="text-xl font-semibold mb-4">7. Copy and paste (CSV) behavior</h2>
+                  <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+                    <li>Pasting a comma-separated list triggers CSV detection</li>
+                    <li>Supports simple names and Google Calendar format (<code className="bg-muted px-1 rounded text-xs">Name &lt;email&gt;</code>)</li>
+                    <li>The name is displayed; the email is stored</li>
+                    <li>Each value is matched against Rippling, adding an existing person when found or creating a custom attendee otherwise.</li>
+                    <li>Repeated names in a pasted list are added once, even if they use different capitalization (for example, <code className="bg-muted px-1 rounded text-xs">john doe</code> and <code className="bg-muted px-1 rounded text-xs">John Doe</code>).</li>
+                    <li>Empty entries and already-selected people are skipped</li>
+                    <li>Show <code className="bg-muted px-1 rounded text-xs">Add X attendees</code> to confirm adding all at once</li>
+                    <li>When CSV is detected, <code className="bg-muted px-1 rounded text-xs">Create new attendee</code> is hidden</li>
+                  </ul>
+                </section>
 
-            <div className="h-px bg-border" />
+                <div className="h-px bg-border" />
 
-            {/* Edge Cases */}
-            <section>
-              <h2 className="text-xl font-semibold mb-4">8. Validation and edge cases</h2>
-              <ul className="list-disc list-inside space-y-2 text-muted-foreground">
-                <li>The purchaser cannot be the only removable attendee</li>
-                <li>Search input is trimmed before processing</li>
-                <li>At least one attendee is required (enforced by the parent component)</li>
-                <li>Attendees added with only a single name are invalid. Show inline validation: <code className="bg-muted px-1 rounded text-xs">Remove this attendee and enter a full name</code></li>
-              </ul>
-            </section>
+                {/* Edge Cases */}
+                <section>
+                  <h2 className="text-xl font-semibold mb-4">8. Validation and edge cases</h2>
+                  <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+                    <li>The purchaser cannot be the only removable attendee</li>
+                    <li>Search input is trimmed before processing</li>
+                    <li>At least one attendee is required (enforced by the parent component)</li>
+                    <li>Attendees added with only a single name are invalid. Show inline validation: <code className="bg-muted px-1 rounded text-xs">Remove this attendee and enter a full name</code></li>
+                  </ul>
+                </section>
+              </>
+            ) : (
+              <>
+                {/* Mobile Spec - 1-shot prompt */}
+                <section className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <p className="text-sm text-blue-800">
+                    <strong>1-shot prompt for Cursor.</strong> This spec defines the mobile-responsive variant of the attendee multi-select with full feature parity. Use this to build the component end-to-end in a single pass.
+                  </p>
+                </section>
+
+                <section>
+                  <h2 className="text-xl font-semibold mb-4">Core purpose</h2>
+                  <p className="text-muted-foreground">
+                    A people-aware multi-select backed by HRIS data, optimized for admin workflows (search + copy/paste), resilient in dense states, and adaptable across device-specific interaction patterns.
+                  </p>
+                </section>
+
+                <div className="h-px bg-border" />
+
+                <section>
+                  <h2 className="text-xl font-semibold mb-4">1. Layout and responsiveness</h2>
+                  <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+                    <li>The component must be fully responsive across desktop (with receipt component in a right rail), tablet, and mobile</li>
+                    <li>When displayed alongside a receipt component in a right rail, the multi-select must not overflow horizontally</li>
+                    <li>Chip layout must adapt to available width; input and chips must reflow without truncating critical information</li>
+                    <li>Support inline chip layout when horizontal space allows, and vertical chip stacking when space is constrained</li>
+                    <li>No horizontal scrolling for chips; vertical scrolling allowed within defined height limits</li>
+                    <li>Resizing or collapsing the receipt rail must not break chip ordering, input focus, or scroll position</li>
+                    <li>On mobile, the component expands to full width; receipt content stacks according to layout rules</li>
+                  </ul>
+                </section>
+
+                <section>
+                  <h2 className="text-xl font-semibold mb-4">2. Mobile-specific pattern adaptations</h2>
+                  <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+                    <li>Mobile interaction patterns may differ from desktop where appropriate</li>
+                    <li>The active state of the attendee input should adapt for touch: use clearer focus and active affordances than desktop</li>
+                    <li>Avoid dense inline states that are hard to interact with on touch devices</li>
+                    <li>Searching for people or adding a pasted list may occur on a dedicated surface (e.g., a full-screen sheet or modal instead of inline dropdowns)</li>
+                    <li>Any mobile-specific pattern changes must preserve feature parity and outcomes with desktop behavior</li>
+                  </ul>
+                </section>
+
+                <div className="h-px bg-border" />
+
+                <section>
+                  <h2 className="text-xl font-semibold mb-4">3. Data model</h2>
+                  <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+                    <li>An attendee can be an existing person from HRIS (stable id) or a custom attendee (full name, optional email)</li>
+                    <li>A purchaser exists and is selected by default</li>
+                  </ul>
+                </section>
+
+                <section>
+                  <h2 className="text-xl font-semibold mb-4">4. Basic interaction (desktop and mobile)</h2>
+                  <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+                    <li>Selecting the input opens a searchable typeahead</li>
+                    <li>Search supports name, email, title, and department (max 10 results)</li>
+                    <li>Selecting a result adds a chip and clears the query</li>
+                    <li>Selected people are excluded from search results</li>
+                    <li>Attendees render in the order they were added; removing and re-adding places them at the end</li>
+                  </ul>
+                </section>
+
+                <section>
+                  <h2 className="text-xl font-semibold mb-4">5. Typeahead behavior</h2>
+                  <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+                    <li>The typeahead placeholder reads: <code className="bg-muted px-1 rounded text-xs">Search for people or paste a list</code></li>
+                    <li>Autocomplete suggestions appear as the user types</li>
+                    <li><strong>Desktop:</strong> Press <code className="bg-muted px-1 rounded text-xs">Tab</code> to accept the autocomplete suggestion; <code className="bg-muted px-1 rounded text-xs">Cmd+Z</code> / <code className="bg-muted px-1 rounded text-xs">Ctrl+Z</code> clears the entire query</li>
+                    <li><strong>Mobile:</strong> Provide a clear-query control equivalent to <code className="bg-muted px-1 rounded text-xs">Cmd/Ctrl+Z</code></li>
+                    <li>The search input is trimmed before processing</li>
+                  </ul>
+                </section>
+
+                <div className="h-px bg-border" />
+
+                <section>
+                  <h2 className="text-xl font-semibold mb-4">6. Purchaser behavior</h2>
+                  <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+                    <li>Purchaser is selected by default; chip label format: <Badge variant="secondary" className="inline-flex h-6 mx-1">Name · Purchaser</Badge></li>
+                    <li>The purchaser cannot be removed if they are the only attendee</li>
+                    <li>If removed while others remain, show helper text: <code className="bg-muted px-1 rounded text-xs">Purchaser not on expense</code></li>
+                    <li>Re-adding the purchaser places them at the bottom of the list</li>
+                  </ul>
+                </section>
+
+                <section>
+                  <h2 className="text-xl font-semibold mb-4">7. Custom attendees</h2>
+                  <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+                    <li>When there are 3 or fewer search results and no existing person matches, show <code className="bg-muted px-1 rounded text-xs">Create new attendee</code></li>
+                    <li>Creates a custom attendee from the entered name; requires a full name (first + last)</li>
+                    <li>Custom attendee chip label format: <Badge variant="secondary" className="inline-flex h-6 mx-1">Name · Custom attendee</Badge></li>
+                    <li>Custom attendees behave like regular attendees for search, add, and remove</li>
+                  </ul>
+                </section>
+
+                <section>
+                  <h2 className="text-xl font-semibold mb-4">8. Validation</h2>
+                  <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+                    <li>At least one attendee is always required (enforced by the parent)</li>
+                    <li>Attendees added with only a single name are invalid; show inline validation: <code className="bg-muted px-1 rounded text-xs">Remove this attendee and enter a full name</code></li>
+                    <li>The purchaser cannot be the only removable attendee</li>
+                  </ul>
+                </section>
+
+                <div className="h-px bg-border" />
+
+                <section>
+                  <h2 className="text-xl font-semibold mb-4">9. Visual behavior</h2>
+                  <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+                    <li>Hovering an attendee chip shows a profile card with role, org, and contact info (desktop)</li>
+                    <li>Chips support optional avatar display</li>
+                    <li>Show up to 4 attendees before vertical scrolling</li>
+                    <li>The input supports vertical resizing from 50px to 400px</li>
+                    <li>Chip layout adapts based on available width (inline vs stacked)</li>
+                    <li>Dense states remain usable and readable next to the receipt rail</li>
+                  </ul>
+                </section>
+
+                <section>
+                  <h2 className="text-xl font-semibold mb-4">10. Cost calculation (parent-driven)</h2>
+                  <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+                    <li>Helper text shows <code className="bg-muted px-1 rounded text-xs">Amount per person</code></li>
+                    <li>Calculated as total ÷ attendee count; updates automatically when attendees or total change</li>
+                    <li>Appends <code className="bg-muted px-1 rounded text-xs">Purchaser not on expense</code> when applicable</li>
+                  </ul>
+                </section>
+
+                <div className="h-px bg-border" />
+
+                <section>
+                  <h2 className="text-xl font-semibold mb-4">11. Copy + paste (CSV) behavior</h2>
+                  <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+                    <li>Pasting a comma-separated list triggers CSV detection</li>
+                    <li>Supported formats: simple names (<code className="bg-muted px-1 rounded text-xs">Jordan Alvarez, Alexandra Chen</code>) and Google Calendar format (<code className="bg-muted px-1 rounded text-xs">Alex Blue &lt;a.blue@rippling.com&gt;</code>)</li>
+                    <li>For Google Calendar format, display the name and store the email on the back end</li>
+                    <li>Each value is matched against Rippling, adding an existing person when found or creating a custom attendee otherwise</li>
+                    <li>Repeated names in a pasted list are added once, even if they use different capitalization</li>
+                    <li>Skip empty values and already-selected people</li>
+                    <li>When CSV is detected, show <code className="bg-muted px-1 rounded text-xs">Add X attendees</code> to confirm; hide <code className="bg-muted px-1 rounded text-xs">Create new attendee</code></li>
+                  </ul>
+                </section>
+
+                <section>
+                  <h2 className="text-xl font-semibold mb-4">12. Ordering and scrolling</h2>
+                  <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+                    <li>Attendees always render in add order; re-added attendees appear last</li>
+                    <li>The list auto-scrolls to the newest addition</li>
+                    <li>Scrolling within the multi-select must not affect receipt scroll behavior</li>
+                  </ul>
+                </section>
+
+                <div className="h-px bg-border" />
+
+                <section>
+                  <h2 className="text-xl font-semibold mb-4">13. Parity requirements</h2>
+                  <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+                    <li>Desktop and mobile must support the same core behaviors and outcomes</li>
+                    <li>Interaction patterns may differ to suit input method and screen size</li>
+                    <li>No desktop-only functionality without a mobile equivalent</li>
+                  </ul>
+                </section>
+
+                <section>
+                  <h2 className="text-xl font-semibold mb-4">14. Deliverables</h2>
+                  <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+                    <li>A reusable, fully responsive component with clear separation of UI, state, and validation</li>
+                    <li>Layout-aware behavior that adapts to a right-rail receipt and mobile surfaces</li>
+                    <li>Predictable ordering and overflow handling</li>
+                    <li>Inline comments where behavior deviates from native defaults (e.g., <code className="bg-muted px-1 rounded text-xs">Cmd/Ctrl+Z</code> handling)</li>
+                  </ul>
+                </section>
+
+                <div className="h-px bg-border" />
+
+                {/* Copyable prompt */}
+                <section className="bg-muted/50 p-4 rounded-lg">
+                  <h2 className="text-lg font-semibold mb-3">Copyable 1-shot prompt</h2>
+                  <p className="text-sm text-muted-foreground mb-3">Copy the prompt below into Cursor to build the mobile-responsive variant with full parity.</p>
+                  <div className="relative">
+                    <pre id="mobile-prompt-text" className="bg-white border border-[rgba(0,0,0,0.1)] rounded-lg p-4 text-xs text-muted-foreground overflow-x-auto max-h-[400px] overflow-y-auto whitespace-pre-wrap">
+{`Build a production-ready attendee multi-select component with full desktop and mobile parity. This component is used when submitting a reimbursement and must behave correctly in responsive layouts, including when rendered next to a receipt viewer in a right-hand rail. Treat all requirements below as a specification, not suggestions.
+
+## Core purpose
+
+A people-aware multi-select backed by HRIS data, optimized for admin workflows (search + copy/paste), resilient in dense states, and adaptable across device-specific interaction patterns.
+
+## Layout and responsiveness (critical)
+
+- The component must be fully responsive across desktop (with receipt component in a right rail), tablet, and mobile
+- When displayed alongside a receipt component in a right rail:
+  - The multi-select must not overflow horizontally
+  - Chip layout must adapt to available width
+  - Input and chips must reflow without truncating critical information
+- Support inline chip layout when horizontal space allows, and vertical chip stacking when space is constrained
+- Chip overflow: no horizontal scrolling for chips; vertical scrolling allowed within defined height limits
+- Resizing or collapsing the receipt rail must not break chip ordering, input focus, or scroll position
+- On mobile: the component expands to full width; receipt content stacks according to layout rules
+
+## Mobile-specific pattern adaptations
+
+- Mobile interaction patterns may differ from desktop where appropriate
+- The active state of the attendee input should adapt for touch: use clearer focus and active affordances than desktop
+- Avoid dense inline states that are hard to interact with
+- Searching for people or adding a pasted list may occur on a dedicated surface (e.g., a full-screen sheet or modal instead of inline dropdowns)
+- Any mobile-specific pattern changes must preserve feature parity and outcomes with desktop behavior
+
+## Data model
+
+- An attendee can be: an existing person from HRIS (stable id), or a custom attendee (full name, optional email)
+- A purchaser exists and is selected by default
+
+## Basic interaction (desktop and mobile)
+
+- Selecting the input opens a searchable typeahead
+- Search supports name, email, title, and department (max 10 results)
+- Selecting a result adds a chip and clears the query
+- Selected people are excluded from search results
+- Attendees render in the order they were added; removing and re-adding places them at the end
+
+## Typeahead behavior
+
+- The typeahead placeholder reads: "Search for people or paste a list"
+- Autocomplete suggestions appear as the user types
+- Desktop: Press Tab to accept the autocomplete suggestion; Cmd+Z / Ctrl+Z clears the entire query (custom behavior, not character-level undo)
+- Mobile: Provide a clear-query control equivalent to Cmd/Ctrl+Z
+- The search input is trimmed before processing
+
+## Purchaser behavior
+
+- Purchaser is selected by default; chip label format: Name · Purchaser
+- The purchaser cannot be removed if they are the only attendee
+- If removed while others remain, show helper text: "Purchaser not on expense"
+- Re-adding the purchaser places them at the bottom of the list
+
+## Custom attendees
+
+- When there are 3 or fewer search results and no existing person matches, show "Create new attendee"
+- Creates a custom attendee from the entered name; requires a full name (first + last)
+- Custom attendee chip label format: Name · Custom attendee
+- Custom attendees behave like regular attendees for search, add, and remove
+
+## Validation
+
+- At least one attendee is always required (enforced by the parent)
+- Attendees added with only a single name are invalid; show inline validation: "Remove this attendee and enter a full name"
+- The purchaser cannot be the only removable attendee
+
+## Visual behavior
+
+- Hovering an attendee chip shows a profile card with role, org, and contact info (desktop)
+- Chips support optional avatar display
+- Show up to 4 attendees before vertical scrolling
+- The input supports vertical resizing from 50px to 400px
+- Chip layout adapts based on available width (inline vs stacked)
+- Dense states remain usable and readable next to the receipt rail
+
+## Cost calculation (parent-driven)
+
+- Helper text shows "Amount per person"
+- Calculated as total ÷ attendee count; updates automatically when attendees or total change
+- Appends "Purchaser not on expense" when applicable
+
+## Copy + paste (CSV) behavior
+
+- Pasting a comma-separated list triggers CSV detection
+- Supported formats: simple names (Jordan Alvarez, Alexandra Chen) and Google Calendar format (Alex Blue <a.blue@rippling.com>)
+- For Google Calendar format: display the name, store the email on the back end
+- Each pasted value is checked against HRIS: if a match exists, add that person; otherwise, create a custom attendee
+- Repeated names in a pasted list are added once, even if they use different capitalization (e.g., john doe and John Doe result in a single attendee)
+- Skip empty values and already-selected people
+- When CSV is detected: show "Add X attendees" to confirm adding all at once; hide "Create new attendee" to avoid conflicting actions
+
+## Ordering and scrolling
+
+- Attendees always render in add order; re-added attendees appear last
+- The list auto-scrolls to the newest addition
+- Scrolling within the multi-select must not affect receipt scroll behavior
+
+## Parity requirements
+
+- Desktop and mobile must support the same core behaviors and outcomes
+- Interaction patterns may differ to suit input method and screen size
+- No desktop-only functionality without a mobile equivalent
+
+## Deliverables
+
+- A reusable, fully responsive component with clear separation of UI, state, and validation
+- Layout-aware behavior that adapts to a right-rail receipt and mobile surfaces
+- Predictable ordering and overflow handling
+- Inline comments where behavior deviates from native defaults (e.g., Cmd/Ctrl+Z handling)
+
+Build this end to end with correctness, responsiveness, and parity as the top priorities.`}
+                    </pre>
+                    <button
+                      className="absolute top-2 right-2 px-2 py-1 text-xs bg-white border border-[rgba(0,0,0,0.2)] rounded hover:bg-muted transition-colors"
+                      onClick={() => {
+                        const el = document.getElementById('mobile-prompt-text')
+                        if (el) {
+                          navigator.clipboard.writeText(el.textContent || '')
+                        }
+                      }}
+                    >
+                      Copy
+                    </button>
+                  </div>
+                </section>
+              </>
+            )}
           </div>
         </SheetContent>
       </Sheet>
